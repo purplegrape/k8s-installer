@@ -44,7 +44,7 @@ install_containerd(){
   mkdir -p download
   pushd download
     if [ -f crictl-v1.12.0-linux-amd64.tar.gz ];then
-      tar zxf files/crictl-v1.12.0-linux-amd64.tar.gz
+      tar zxf crictl-v1.12.0-linux-amd64.tar.gz
       install -D -m 755 crictl /usr/bin/crictl
       /usr/bin/crictl completion bash > /etc/bash_completion.d/crictl.bash
       rm -rf crictl
@@ -84,7 +84,7 @@ install_coredns(){
   mkdir -p download
   pushd download
     if [  -f coredns_1.2.2_linux_amd64.tgz ];then
-      tar zxf files/coredns_1.2.2_linux_amd64.tgz
+      tar zxf coredns_1.2.2_linux_amd64.tgz
       install -D -m 755 coredns /usr/bin/coredns
       rm -rf coredns
       else
