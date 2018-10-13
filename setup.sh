@@ -351,7 +351,7 @@ install_node(){
    
   if [ -f /etc/kubernetes/kubelet.yaml ];then
     systemctl start kubelet
-    sleep 1
+    sleep 2
     else
     echo -e "\033[31mWarning:\033[0m\nBefore start kubelet,\nplease copy the following files from kubernetes master"
     echo -e "\033[32m/etc/kubernetes/kubelet.yaml\033[0m"
@@ -361,7 +361,7 @@ install_node(){
   if [ -f /etc/kubernetes/kube-proxy.yaml ];then
     systemctl start kube-proxy
     echo -e "ip_vs\nip_vs_rr\nip_vs_wrr\nip_vs_sh" > /etc/modules-load.d/ipvs.conf
-    sleep 1
+    sleep 2
     else
     echo -e "\033[31mWarning:\033[0m\nBefore start kube-proxy,\nplease copy the following files from kubernetes master"
     echo -e "\033[32m/etc/kubernetes/kube-proxy.yaml\033[0m"
