@@ -17,11 +17,11 @@ check_tarball(){
   mkdir -p download
   pushd download
     if [ -f kubernetes-server-linux-amd64.tar.gz ];then
-	  rm -rf kubernetes
+      rm -rf kubernetes
       tar zxf kubernetes-server-linux-amd64.tar.gz
       else
-	  echo -e "please run wget https://dl.k8s.io/v1.12.1/kubernetes-server-linux-amd64.tar.gz"
-	  exit 1
+      echo -e "please run wget https://dl.k8s.io/v1.12.1/kubernetes-server-linux-amd64.tar.gz"
+      exit 1
     fi
   popd
 }
@@ -46,9 +46,9 @@ install_containerd(){
   pushd download
     if [ -f crictl-v1.12.0-linux-amd64.tar.gz ];then
       tar zxf files/crictl-v1.12.0-linux-amd64.tar.gz
-	  install -D -m 755 crictl /usr/bin/crictl
-	  /usr/bin/crictl completion bash > /etc/bash_completion.d/crictl.bash
-	  rm -rf crictl
+      install -D -m 755 crictl /usr/bin/crictl
+      /usr/bin/crictl completion bash > /etc/bash_completion.d/crictl.bash
+      rm -rf crictl
       else
       echo -e "please run wget https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.12.0/crictl-v1.12.0-linux-amd64.tar.gz"
       exit 1
@@ -58,9 +58,9 @@ install_containerd(){
   pushd download
     if [ -f containerd-1.2.0-rc.1.linux-amd64.tar.gz ];then
       tar zxf containerd-1.2.0-rc.1.linux-amd64.tar.gz
-	  install -D bin/containerd /usr/bin/containerd
+      install -D bin/containerd /usr/bin/containerd
       install -D bin/containerd-shim /usr/bin/containerd-shim
-	  rm -rf bin
+      rm -rf bin
       else
       echo -e "please run wget https://github.com/containerd/containerd/releases/download/v1.2.0-rc.1/containerd-1.2.0-rc.1.linux-amd64.tar.gz"
       exit 1
@@ -87,11 +87,11 @@ install_coredns(){
   pushd download
     if [  -f coredns_1.2.2_linux_amd64.tgz ];then
       tar zxf files/coredns_1.2.2_linux_amd64.tgz
-	  install -D -m 755 coredns /usr/bin/coredns
-	  rm -rf coredns
-	  else
-	  echo -e "please run wget https://github.com/coredns/coredns/releases/download/v1.2.2/coredns_1.2.2_linux_amd64.tgz"
-	  exit 1
+      install -D -m 755 coredns /usr/bin/coredns
+      rm -rf coredns
+      else
+      echo -e "please run wget https://github.com/coredns/coredns/releases/download/v1.2.2/coredns_1.2.2_linux_amd64.tgz"
+      exit 1
     fi
   popd
 
@@ -127,16 +127,16 @@ install_calico(){
   pushd download
     If [ -f calico-amd64 ];then
       install -D -m 755 calico-amd64 /usr/libexec/cni/calico
-	  else
+      else
       echo -e "please run wget https://github.com/projectcalico/cni-plugin/releases/download/v3.2.3/calico-amd64"
-	  exit 1
+      exit 1
     fi
 
     if [ -f calico-ipam ];then
       install -D -m 755 calico-ipam /usr/libexec/cni/calico-ipam
-	  else
+      else
       echo -e "please run wget https://github.com/projectcalico/cni-plugin/releases/download/v3.2.3/calico-ipam-amd64"
-	  exit 1
+      exit 1
     fi
   popd
 }
@@ -353,7 +353,7 @@ install_node(){
    
   if [ -f /etc/kubernetes/kubelet.yaml ];then
     systemctl start kubelet
-	sleep 1
+    sleep 1
     else
     echo -e "\033[31mWarning:\033[0m\nBefore start kubelet,\nplease copy the following files from kubernetes master"
     echo -e "\033[32m/etc/kubernetes/kubelet.yaml\033[0m"
@@ -362,8 +362,8 @@ install_node(){
 
   if [ -f /etc/kubernetes/kube-proxy.yaml ];then
     systemctl start kube-proxy
-	echo -e "ip_vs\nip_vs_rr\nip_vs_wrr\nip_vs_sh" > /etc/modules-load.d/ipvs.conf
-	sleep 1
+    echo -e "ip_vs\nip_vs_rr\nip_vs_wrr\nip_vs_sh" > /etc/modules-load.d/ipvs.conf
+    sleep 1
     else
     echo -e "\033[31mWarning:\033[0m\nBefore start kube-proxy,\nplease copy the following files from kubernetes master"
     echo -e "\033[32m/etc/kubernetes/kube-proxy.yaml\033[0m"
