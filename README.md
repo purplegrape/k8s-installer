@@ -7,7 +7,7 @@ official binary file based k8s installer for kubernetes 1.12.1 (still not workin
 
 
 ##### 使用方法（服务端master）  
-yum install git wget -y 
+yum install git wget -y  
 git clone https://github.com/purplegrape/k8s-installer  
 mkdir -p download  
 wget -i files/filelist.txt -P download/  
