@@ -122,7 +122,7 @@ install_docker(){
 install_calico(){
   mkdir -p download
   pushd download
-    If [ -f calico-amd64 ];then
+    if [ -f calico-amd64 ];then
       install -D -m 755 calico-amd64 /usr/libexec/cni/calico
       else
       echo -e "please run wget https://github.com/projectcalico/cni-plugin/releases/download/v3.2.3/calico-amd64"
@@ -306,7 +306,7 @@ post_install_master(){
 }
 
 install_master(){
-  yum install epel-releaase -y
+  yum install epel-release -y
   yum install bash-completion etcd openssl moreutils git wget rsync -y
 
   check_user
