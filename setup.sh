@@ -67,9 +67,9 @@ install_containerd(){
     fi
   popd
 
-  install -D -m 644 etc/crictl.yaml /etc/crictl.yaml
-  install -D etc/containerd/config.toml /etc/containerd/config.toml
-  install -D usr/lib/systemd/system/containerd.service /usr/lib/systemd/system/containerd.service
+  install -D -m 644 files/etc/crictl.yaml /etc/crictl.yaml
+  install -D files/etc/containerd/config.toml /etc/containerd/config.toml
+  install -D files/usr/lib/systemd/system/containerd.service /usr/lib/systemd/system/containerd.service
   systemctl daemon-reload
   systemctl enable containerd
   systemctl restart containerd
@@ -87,7 +87,7 @@ install_coredns(){
   pushd download
     if [  -f coredns_1.2.2_linux_amd64.tgz ];then
       tar zxf files/coredns_1.2.2_linux_amd64.tgz
-	  install -m 755 coredns /usr/bin
+	  install -D -m 755 coredns /usr/bin/coredns
 	  rm -rf coredns
 	  else
 	  echo -e "please run wget https://github.com/coredns/coredns/releases/download/v1.2.2/coredns_1.2.2_linux_amd64.tgz"
@@ -95,8 +95,8 @@ install_coredns(){
     fi
   popd
 
-  install -D -m 644 etc/coredns/Corefile /etc/coredns/Corefile
-  install -D -m 644 usr/lib/systemd/system/coredns.service /usr/lib/systemd/system/coredns.service
+  install -D -m 644 files/etc/coredns/Corefile /etc/coredns/Corefile
+  install -D -m 644 files/usr/lib/systemd/system/coredns.service /usr/lib/systemd/system/coredns.service
   systemctl daemon-reload
   systemctl enable coredns
   systemctl restart coredns
@@ -256,12 +256,12 @@ install_master_files(){
   install -D -m 755 download/kubernetes/server/bin/kube-scheduler /usr/bin/kube-scheduler
   install -D -m 755 download/kubernetes/server/bin/kubectl /usr/bin/kubectl
   install -D -m 755 download/kubernetes/server/bin/kubeadm /usr/bin/kubeadm
-  install -D -m 644 etc/sysconfig/kube-apiserver /etc/sysconfig/kube-apiserver
-  install -D -m 644 etc/sysconfig/kube-scheduler /etc/sysconfig/kube-scheduler
-  install -D -m 644 etc/sysconfig/kube-controller-manager /etc/sysconfig/kube-controller-manager
-  install -D -m 644 usr/lib/systemd/system/kube-apiserver.service /usr/lib/systemd/system/kube-apiserver.service
-  install -D -m 644 usr/lib/systemd/system/kube-scheduler.service /usr/lib/systemd/system/kube-scheduler.service
-  install -D -m 644 usr/lib/systemd/system/kube-controller-manager.service /usr/lib/systemd/system/kube-controller-manager.service
+  install -D -m 644 files/etc/sysconfig/kube-apiserver /etc/sysconfig/kube-apiserver
+  install -D -m 644 files/etc/sysconfig/kube-scheduler /etc/sysconfig/kube-scheduler
+  install -D -m 644 files/etc/sysconfig/kube-controller-manager /etc/sysconfig/kube-controller-manager
+  install -D -m 644 files/usr/lib/systemd/system/kube-apiserver.service /usr/lib/systemd/system/kube-apiserver.service
+  install -D -m 644 files/usr/lib/systemd/system/kube-scheduler.service /usr/lib/systemd/system/kube-scheduler.service
+  install -D -m 644 files/usr/lib/systemd/system/kube-controller-manager.service /usr/lib/systemd/system/kube-controller-manager.service
   systemctl daemon-reload
   systemctl enable kube-apiserver kube-controller-manager kube-scheduler
 
@@ -273,12 +273,12 @@ install_node_files(){
   check_tarball
   install -D -m 755 download/kubernetes/server/bin/kubelet /usr/bin/kubelet
   install -D -m 755 download/kubernetes/server/bin/kube-proxy /usr/bin/kube-proxy
-  install -D -m 644 etc/sysconfig/kubelet /etc/sysconfig/kubelet
-  install -D -m 644 etc/sysconfig/kube-proxy /etc/sysconfig/kube-proxy
-  install -D -m 644 usr/lib/systemd/system/kubelet.service /usr/lib/systemd/system/kubelet.service
-  install -D -m 644 usr/lib/systemd/system/kube-proxy.service /usr/lib/systemd/system/kube-proxy.service
-  install -D -m 644 etc/cni/net.d/20-loopback.conf /etc/cni/net.d/20-loopback.conf
-  install -D -m 644 etc/cni/net.d/30-cni-bridge.conf /etc/cni/net.d/30-cni-birdge.conf
+  install -D -m 644 files/etc/sysconfig/kubelet /etc/sysconfig/kubelet
+  install -D -m 644 files/etc/sysconfig/kube-proxy /etc/sysconfig/kube-proxy
+  install -D -m 644 files/usr/lib/systemd/system/kubelet.service /usr/lib/systemd/system/kubelet.service
+  install -D -m 644 files/usr/lib/systemd/system/kube-proxy.service /usr/lib/systemd/system/kube-proxy.service
+  install -D -m 644 files/etc/cni/net.d/20-loopback.conf /etc/cni/net.d/20-loopback.conf
+  install -D -m 644 files/etc/cni/net.d/30-cni-bridge.conf /etc/cni/net.d/30-cni-birdge.conf
   mkdir -p /var/lib/kubelet
   systemctl daemon-reload
   systemctl enable kubelet kube-proxy
