@@ -68,8 +68,8 @@ install_containerd(){
   popd
 
   install -D -m 644 files/etc/crictl.yaml /etc/crictl.yaml
-  install -D files/etc/containerd/config.toml /etc/containerd/config.toml
-  install -D files/usr/lib/systemd/system/containerd.service /usr/lib/systemd/system/containerd.service
+  install -D -m 644 files/etc/containerd/config.toml /etc/containerd/config.toml
+  install -D -m 644 files/usr/lib/systemd/system/containerd.service /usr/lib/systemd/system/containerd.service
   systemctl daemon-reload
   systemctl enable containerd
   systemctl restart containerd
