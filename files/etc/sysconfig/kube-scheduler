@@ -1,0 +1,1 @@
+KUBE_SCHEDULER_ARGS="--kubeconfig=/etc/kubernetes/admin.yaml --leader-elect=true --logtostderr=true --v 0"

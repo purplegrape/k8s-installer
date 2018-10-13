@@ -1,0 +1,150 @@
+# persistent data location
+root = "/var/lib/containerd"
+
+# runtime state information
+state = "/run/containerd"
+
+# set containerd as a subreaper on linux when it is not running as PID 1
+subreaper = true
+
+# set containerd's OOM score
+oom_score = -999
+
+# grpc configuration
+[grpc]
+  address = "/run/containerd/containerd.sock"
+  # socket uid
+  uid = 0
+  # socket gid
+  gid = 0
+
+# metrics configuration
+[metrics]
+  # tcp address!
+  address = ""
+
+[plugins.linux]
+  # shim binary name/path
+  shim = "/usr/bin/containerd-shim"
+  # runtime binary name/path
+  runtime = "/usr/bin/runc"
+  # do not use a shim when starting containers, saves on memory but
+  # live restore is not supported
+  no_shim = false
+  # display shim logs in the containerd daemon's log output
+  shim_debug = true
+  # do not put the shim in its own mount namespace
+  # (this only need to be set on kernel < 3.18)
+  shim_no_newns = true
+  
+# The "plugins.cri" table contains all of the server options.
+[plugins.cri]
+  # stream_server_address is the ip address streaming server is listening on.
+  stream_server_address = "127.0.0.1"
+
+  # stream_server_port is the port streaming server is listening on.
+  stream_server_port = "0"
+
+  # enable_selinux indicates to enable the selinux support.
+  enable_selinux = false
+
+  # sandbox_image is the image used by sandbox container.
+  sandbox_image = "k8s.gcr.io/pause:3.1"
+
+  # stats_collect_period is the period (in seconds) of snapshots stats collection.
+  stats_collect_period = 10
+
+  # systemd_cgroup enables systemd cgroup support.
+  systemd_cgroup = false
+
+  # enable_tls_streaming enables the TLS streaming support. 
+  # It generates a self-sign certificate unless the following x509_key_pair_streaming are both set.
+  enable_tls_streaming = false
+  
+  # "plugins.cri.x509_key_pair_streaming" contains a x509 valid key pair to stream with tls.
+  [plugins.cri.x509_key_pair_streaming]
+    # tls_cert_file is the filepath to the certificate paired with the "tls_key_file"
+    tls_cert_file = ""
+    # tls_key_file is the filepath to the private key paired with the "tls_cert_file"
+    tls_key_file = ""
+
+  # max_container_log_line_size is the maximum log line size in bytes for a container.
+  # Log line longer than the limit will be split into multiple lines. -1 means no
+  # limit.
+  max_container_log_line_size = 16384
+
+  # "plugins.cri.containerd" contains config related to containerd
+  [plugins.cri.containerd]
+
+    # snapshotter is the snapshotter used by containerd.
+    snapshotter = "overlayfs"
+
+    # no_pivot disables pivot-root (linux only), required when running a container in a RamDisk with runc
+    no_pivot = false
+
+    # "plugins.cri.containerd.default_runtime" is the runtime to use in containerd.
+    [plugins.cri.containerd.default_runtime]
+      # runtime_type is the runtime type to use in containerd e.g. io.containerd.runtime.v1.linux
+      runtime_type = "io.containerd.runtime.v1.linux"
+
+      # runtime_engine is the name of the runtime engine used by containerd.
+      runtime_engine = ""
+
+      # runtime_root is the directory used by containerd for runtime state.
+      runtime_root = ""
+
+    # "plugins.cri.containerd.untrusted_workload_runtime" is a runtime to run untrusted workloads on it.
+
+    # DEPRECATED: use plugins.cri.runtimes instead. If provided, this runtime is mapped to the
+    #     runtime handler named 'untrusted'. It is a configuration error to provide both the (now
+    #     deprecated) UntrustedWorkloadRuntime and a handler in the Runtimes handler map (below) for
+    #     'untrusted' workloads at the same time. Please provide one or the other.
+    [plugins.cri.containerd.untrusted_workload_runtime]
+      # runtime_type is the runtime type to use in containerd e.g. io.containerd.runtime.v1.linux
+      runtime_type = ""
+
+      # runtime_engine is the name of the runtime engine used by containerd.
+      runtime_engine = ""
+
+      # runtime_root is the directory used by containerd for runtime state.
+      runtime_root = ""
+
+    # plugins.cri.containerd.runtimes is a map from CRI RuntimeHandler strings, which specify types
+    # of runtime configurations, to the matching configurations. In this example,
+    # 'runtime_handler_name' is the RuntimeHandler string to match.
+    [plugins.cri.containerd.runtimes.runtime_handler_name]
+      # runtime_type is the runtime type to use in containerd e.g. io.containerd.runtime.v1.linux
+      runtime_type = ""
+
+      # runtime_engine is the name of the runtime engine used by containerd.
+      runtime_engine = ""
+
+      # runtime_root is the directory used by containerd for runtime state.
+      runtime_root = ""
+
+  # "plugins.cri.cni" contains config related to cni
+  [plugins.cri.cni]
+    # bin_dir is the directory in which the binaries for the plugin is kept.
+    bin_dir = "/usr/libexec/cni"
+
+    # conf_dir is the directory in which the admin places a CNI conf.
+    conf_dir = "/etc/cni/net.d"
+
+    # conf_template is the file path of golang template used to generate
+    # cni config.
+    # If this is set, containerd will generate a cni config file from the
+    # template. Otherwise, containerd will wait for the system admin or cni
+    # daemon to drop the config file into the conf_dir.
+    # This is a temporary backward-compatible solution for kubenet users
+    # who don't have a cni daemonset in production yet.
+    # This will be deprecated when kubenet is deprecated.
+    conf_template = ""
+
+  # "plugins.cri.registry" contains config related to the registry
+  [plugins.cri.registry]
+
+    # "plugins.cri.registry.mirrors" are namespace to mirror mapping for all namespaces.
+    [plugins.cri.registry.mirrors]
+      [plugins.cri.registry.mirrors."docker.io"]
+        endpoint = ["https://registry-1.docker.io", ]
+

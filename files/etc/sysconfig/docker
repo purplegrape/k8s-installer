@@ -1,0 +1,4 @@
+# add your own docker options
+# eg: --registry-mirror=https://io.docker.com  --insecure-registry 127.0.0.1:5000
+
+OPTIONS=""

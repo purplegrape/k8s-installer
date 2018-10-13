@@ -1,0 +1,14 @@
+{
+	debug
+	errors
+	whoami
+	log
+	proxy . /etc/resolv.conf {
+		except cluster.local
+	}
+	etcd mydomain.com {
+		stubzones
+		path /cluster
+		endpoint http://127.0.0.1:2379
+	}
+}
