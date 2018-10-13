@@ -344,7 +344,6 @@ install_node(){
   yum install ipset conntrack-tools yum-utils lvm2 device-mapper-persistent-data \
     containernetworking-plugins runc conntrack-tools bash-completion socat ebtables bridge-utils wget rsync -y
 
-  check_tarball
   #install_docker
   install_containerd
   install_node_files
