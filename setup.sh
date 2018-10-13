@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# test under CentOS7 and kubernetes 1.12.0 ONLY,
+# test under CentOS7 and kubernetes 1.12.x ONLY,
 # AT YOUR OWN RISK!!
 
 set -x
@@ -41,7 +41,6 @@ clean_iptables_rules(){
 }
 
 install_containerd(){
-  yum install runc bash-completion -y
   mkdir -p download
   pushd download
     if [ -f crictl-v1.12.0-linux-amd64.tar.gz ];then
@@ -77,7 +76,6 @@ install_containerd(){
 
 install_etcd(){
   rm -rf /var/lib/etcd/default.etcd
-  yum install etcd -y
   systemctl enable etcd
   systemctl restart etcd
 }
@@ -112,7 +110,7 @@ install_docker(){
     echo -e "docker-ce has installed"
     else
     yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-    yum install docker-ce yum-utils lvm2 device-mapper-persistent-data containernetworking-plugins conntrack-tools bash-completion socat ebtables bridge-utils wget rsync -y
+    yum install docker-ce -y
     systemctl enable docker
   fi
   mkdir -p /etc/docker
@@ -122,7 +120,6 @@ install_docker(){
 }
 
 install_calico(){
-  yum install ipset conntrack-tools -y
   mkdir -p download
   pushd download
     If [ -f calico-amd64 ];then
@@ -174,9 +171,6 @@ keygen_apiserver(){
 EOF
 
   pushd /etc/kubernetes/pki
-    yum install epel-release -y
-    yum install openssl moreutils -y
-
     openssl genrsa -out apiserver.key 4096
     openssl req -new -key apiserver.key -subj "/CN=k8s-master" -config openssl.cnf -out apiserver.csr
     openssl x509 -req -in apiserver.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 3650 \
@@ -218,7 +212,7 @@ kubeconfig_local_admin(){
 }
 
 kubeconfig_user(){
- #generate kubeconfig
+  #generate kubeconfig
   username=$1
   CA_CERT="/etc/kubernetes/pki/ca.crt"
   CLIENT_CERT="/etc/kubernetes/pki/$username.crt"
@@ -226,7 +220,6 @@ kubeconfig_user(){
 
   TOKEN=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null | base64 | tr -d "=+/[:space:]" | dd bs=32 count=1 2>/dev/null)
   MASTER_IP=$(ifdata -pa eth0)
-
 
   mkdir -p /etc/kubernetes
   > /etc/kubernetes/$username.yaml
@@ -240,7 +233,7 @@ kubeconfig_user(){
 
 gen_kubeconfig(){
   if [ ! -f /usr/bin/kubectl ];then
-    echo -e "warning: You must complete the pre-task \033[31m$0 master\033[0m"
+    echo -e "error: \033[31m/usr/bin/kubectl\033[0m not found"
     exit 1
   fi
   kubeconfig_local_admin
@@ -313,13 +306,14 @@ post_install_master(){
 }
 
 install_master(){
-  keygen
+  yum install epel-releaase -y
+  yum install bash-completion etcd openssl moreutils git wget rsync -y
+
   check_user
-  #install_docker
-  install_containerd
   install_etcd
   install_coredns
   install_master_files
+  keygen
   gen_kubeconfig
   post_install_master
   install_node
@@ -332,7 +326,7 @@ install_master(){
   
   echo
   echo
-  echo -e "\033[32m Good job ! If you see this message, your kubernetes installation has finished.\033[0m"
+  echo -e "\033[32m Good job !! If you see this message, your kubernetes installation has finished.\033[0m"
   echo
   echo
 
@@ -342,13 +336,17 @@ install_master(){
   # kubectl taint nodes --all node-role.kubernetes.io/master-
   
   #check your cert
-  #cd /etc/kubernetes/pki
-  #curl --cacert ca.crt --key /etc/kubernetes/pki/client.key --cert client.crt  https://$(ifdata -pa eth0):6443
+  # cd /etc/kubernetes/pki
+  # curl --cacert ca.crt --key /etc/kubernetes/pki/client.key --cert client.crt  https://$(ifdata -pa eth0):6443
 }
 
 install_node(){
+  yum install ipset conntrack-tools yum-utils lvm2 device-mapper-persistent-data \
+    containernetworking-plugins runc conntrack-tools bash-completion socat ebtables bridge-utils wget rsync -y
+
   check_tarball
-  install_docker
+  #install_docker
+  install_containerd
   install_node_files
    
   if [ -f /etc/kubernetes/kubelet.yaml ];then
@@ -382,9 +380,6 @@ cleanup(){
 }
 
 case $1 in
-  keygen)
-  keygen
-  ;;
   master)
   install_master
   ;;
@@ -398,6 +393,5 @@ case $1 in
   echo "Usage:$0 {master|node|cleanup}"
   exit 1
 esac
-
 
 # the end
