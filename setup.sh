@@ -272,6 +272,7 @@ install_node_files(){
   install -D -m 644 files/usr/lib/systemd/system/kube-proxy.service /usr/lib/systemd/system/kube-proxy.service
   install -D -m 644 files/etc/cni/net.d/20-loopback.conf /etc/cni/net.d/20-loopback.conf
   install -D -m 644 files/etc/cni/net.d/30-cni-bridge.conf /etc/cni/net.d/30-cni-birdge.conf
+  rm -rf download/kubernetes
   mkdir -p /var/lib/kubelet
   systemctl daemon-reload
   systemctl enable kubelet kube-proxy
