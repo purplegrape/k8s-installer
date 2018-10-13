@@ -7,10 +7,9 @@ official binary file based k8s installer for kubernetes 1.12.1 (still not workin
 
 
 ##### 使用方法（服务端master）  
-yum install epel-release -y  
-yum install git wget yum-utils lvm2 device-mapper-persistent-data containernetworking-plugins conntrack-tools bash-completion socat ebtables bridge-utils openssl moreutils -y  
+yum install git wget -y 
 git clone https://github.com/purplegrape/k8s-installer  
-mkdir -p download
+mkdir -p download  
 wget -i files/filelist.txt -P download/  
 chmod 755 setup.sh  
 ./setup.sh master  
@@ -19,9 +18,8 @@ chmod 755 setup.sh
 
 
 ##### 客户端（node）  
-yum install git wget conntrack-tools socat ebtables bridge-utils lvm2 device-mapper-persistent-data containernetworking-plugins -y  
+yum install git wget -y  
 git clone https://github.com/purplegrape/k8s-installer  
-wget https://dl.k8s.io/v1.12.1/kubernetes-server-linux-amd64.tar.gz  
 chmod 755 setup.sh  
 ./setup.sh node  
 
