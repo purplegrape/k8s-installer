@@ -374,7 +374,9 @@ cleanup(){
   systemctl stop kube-scheduler kube-controller-manager || true
   systemctl stop kube-apiserver || true
   systemctl stop etcd coredns || true
-  rm -rf /usr/bin/kube* /etc/Kubernetes /etc/sysconfig/kube* /var/lib/etcd/*
+  rm -rf /usr/bin/kube* /usr/bin/crictl /usr/bin/critest  /usr/bin/coredns /usr/bin/containerd /usr/bin/containerd-shim
+  rm -rf /etc/kubernetes /etc/sysconfig/kube* /var/lib/etcd/* /etc/containerd /etc/crictl.yaml
+  rm -rf /usr/lib/systemd/system/kube* /usr/lib/systemd/system/containerd.service /usr/lib/systemd/system/coredns.service
   systemctl daemon-reload
   clean_iptables_rules
 }
