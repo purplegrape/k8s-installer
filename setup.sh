@@ -357,7 +357,7 @@ install_node(){
   #install_docker
   install_containerd
   install_node_files
-   
+  
   if [ -f /etc/kubernetes/kubelet.yaml ];then
     systemctl start kubelet
     sleep 1
