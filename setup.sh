@@ -83,7 +83,7 @@ install_etcd(){
 install_coredns(){
   mkdir -p download
   pushd download
-    if [  -f coredns_1.2.2_linux_amd64.tgz ];then
+    if [ -f coredns_1.2.2_linux_amd64.tgz ];then
       tar zxf coredns_1.2.2_linux_amd64.tgz
       install -D -m 755 coredns /usr/bin/coredns
       rm -rf coredns
@@ -300,7 +300,7 @@ post_install_master(){
   kubectl create clusterrolebinding mybonding-node-proxier --clusterrole=system:node-proxier --user=kube-proxy
 
   create_serviceaccount admin
-  kubectl create clusterrolebinding mybonding-admin --clusterrole=cluster-admin --user=admin 
+  kubectl create clusterrolebinding mybonding-admin --clusterrole=cluster-admin --user=admin
 
   sleep 1
   systemctl start kube-controller-manager kube-scheduler
@@ -318,9 +318,10 @@ install_master(){
   gen_kubeconfig
   post_install_master
   install_node
+
+  sleep 5
   kubectl label node $HOSTNAME node-role.kubernetes.io/master=master
   #kubectl label node $HOSTNAME node-role.kubernetes.io/worker=worker
-
   kubectl get cs
   kubectl get svc
   kubectl get nodes --show-labels
@@ -342,8 +343,8 @@ install_master(){
 }
 
 install_node(){
-  yum install ipset conntrack-tools yum-utils lvm2 device-mapper-persistent-data \
-    containernetworking-plugins runc conntrack-tools bash-completion socat ebtables bridge-utils wget rsync -y
+  yum install bash-completion  lvm2 device-mapper-persistent-data yum-utils wget rsync \
+    containernetworking-plugins runc ipset conntrack-tools  socat ebtables bridge-utils  -y
 
   #install_docker
   install_containerd
@@ -351,7 +352,7 @@ install_node(){
    
   if [ -f /etc/kubernetes/kubelet.yaml ];then
     systemctl start kubelet
-    sleep 2
+    sleep 1
     else
     echo -e "\033[31mWarning:\033[0m\nBefore start kubelet,\nplease copy the following files from kubernetes master"
     echo -e "\033[32m/etc/kubernetes/kubelet.yaml\033[0m"
@@ -361,7 +362,7 @@ install_node(){
   if [ -f /etc/kubernetes/kube-proxy.yaml ];then
     systemctl start kube-proxy
     echo -e "ip_vs\nip_vs_rr\nip_vs_wrr\nip_vs_sh" > /etc/modules-load.d/ipvs.conf
-    sleep 2
+    sleep 1
     else
     echo -e "\033[31mWarning:\033[0m\nBefore start kube-proxy,\nplease copy the following files from kubernetes master"
     echo -e "\033[32m/etc/kubernetes/kube-proxy.yaml\033[0m"
