@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# test under CentOS7 and kubernetes 1.12.x ONLY,
+# test under CentOS7 and kubernetes 1.12.1 ONLY,
 # AT YOUR OWN RISK!!
 
-set -x
 set -e
 
 if [ $EUID != 0 ];then
@@ -37,7 +36,7 @@ clean_iptables_rules(){
   iptables -P FORWARD ACCEPT
   iptables -P OUTPUT ACCEPT
   iptables-save > /etc/sysconfig/iptables
-  sysctl -w net.ipv4.ip_forward=1
+  sysctl -q -w net.ipv4.ip_forward=1
 }
 
 install_containerd(){
@@ -108,8 +107,8 @@ install_coredns(){
 }
 
 check_user(){
-  getent group  kube || groupadd -r kube
-  getent passwd kube || useradd -g kube  -r -s /sbin/nologin -d / kube
+  getent group  kube > /dev/null || groupadd -r kube
+  getent passwd kube > /dev/null || useradd -r -g kube -s /sbin/nologin -d / kube
 }
 
 install_docker(){
@@ -262,6 +261,8 @@ install_master_files(){
   install -D -m 644 files/usr/lib/systemd/system/kube-apiserver.service /usr/lib/systemd/system/kube-apiserver.service
   install -D -m 644 files/usr/lib/systemd/system/kube-scheduler.service /usr/lib/systemd/system/kube-scheduler.service
   install -D -m 644 files/usr/lib/systemd/system/kube-controller-manager.service /usr/lib/systemd/system/kube-controller-manager.service
+  mkdir -p /var/run/kubernetes
+  chown -R kube:kube /var/run/kubernetes
   systemctl daemon-reload
   systemctl enable kube-apiserver kube-controller-manager kube-scheduler
 
