@@ -61,13 +61,13 @@ install_containerd(){
       exit 1
     fi
 
-    if [ -f containerd-1.2.0-rc.1.linux-amd64.tar.gz ];then
-      tar zxf containerd-1.2.0-rc.1.linux-amd64.tar.gz
+    if [ -f containerd-1.2.0-rc.2.linux-amd64.tar.gz ];then
+      tar zxf containerd-1.2.0-rc.2.linux-amd64.tar.gz
       install -D bin/containerd /usr/bin/containerd
       install -D bin/containerd-shim /usr/bin/containerd-shim
       rm -rf bin
       else
-      echo -e "please run wget https://github.com/containerd/containerd/releases/download/v1.2.0-rc.1/containerd-1.2.0-rc.1.linux-amd64.tar.gz"
+      echo -e "please run wget https://github.com/containerd/containerd/releases/download/v1.2.0-rc.2/containerd-1.2.0-rc.2.linux-amd64.tar.gz"
       exit 1
     fi
   popd
