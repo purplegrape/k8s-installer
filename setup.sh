@@ -26,6 +26,7 @@ check_tarball(){
 }
 
 clean_iptables_rules(){
+  echo -e "\033[32m flush iptables rules.\033[0m"
   iptables -t nat -F
   iptables -t nat -X
   iptables -t nat -Z
@@ -40,6 +41,7 @@ clean_iptables_rules(){
 }
 
 install_containerd(){
+  echo -e "\033[32m configure containerd.\033[0m"
   mkdir -p download
   pushd download
     if [ -f crictl-v1.12.0-linux-amd64.tar.gz ];then
@@ -81,12 +83,14 @@ install_containerd(){
 }
 
 install_etcd(){
+  echo -e "\033[32m configure etcd.\033[0m"
   rm -rf /var/lib/etcd/default.etcd
   systemctl enable etcd
   systemctl restart etcd
 }
 
 install_coredns(){
+  echo -e "\033[32m configure coredns.\033[0m"
   mkdir -p download
   pushd download
     if [ -f coredns_1.2.2_linux_amd64.tgz ];then
@@ -107,11 +111,13 @@ install_coredns(){
 }
 
 check_user(){
+  echo -e "\033[32m checking user.\033[0m"
   getent group  kube > /dev/null || groupadd -r kube
   getent passwd kube > /dev/null || useradd -r -g kube -s /sbin/nologin -d / kube
 }
 
 install_docker(){
+  echo -e "\033[32m configure docker.\033[0m"
   if (rpm -qa |grep -q docker-ce);then
     echo -e "docker-ce has installed"
     else
@@ -126,6 +132,7 @@ install_docker(){
 }
 
 install_calico(){
+  echo -e "\033[32m configure calico.\033[0m"
   mkdir -p download
   pushd download
     if [ -f calico-amd64 ];then
@@ -145,7 +152,7 @@ install_calico(){
 }
 
 keygen_ca(){
-  #generate CA keys
+  echo -e "\033[32m generate CA keys.\033[0m"
   mkdir -p /etc/kubernetes/pki
   pushd /etc/kubernetes/pki
     openssl genrsa -out ca.key 4096
@@ -154,7 +161,7 @@ keygen_ca(){
 }
 
 keygen_apiserver(){
-  #generate apiserver keys
+  echo -e "\033[32m generate apiserver keys.\033[0m"
   mkdir -p /etc/kubernetes/pki
   cat > /etc/kubernetes/pki/openssl.cnf <<EOF
   [req]
@@ -185,7 +192,7 @@ EOF
 }
 
 keygen_other(){
-  #generate other user keys
+  echo -e "\033[32m generate other user keys.\033[0m"
   mkdir -p /etc/kubernetes/pki
   username=$1
   pushd /etc/kubernetes/pki
@@ -207,7 +214,7 @@ keygen(){
 }
 
 kubeconfig_local_admin(){
-  #loca admin kubeconfig
+  echo -e "\033[32m generate local admin kubeconfig.\033[0m"
   mkdir -p /root/.kube/
   > /root/.kube/config
   unset KUBECONFIG
@@ -219,6 +226,7 @@ kubeconfig_local_admin(){
 
 kubeconfig_user(){
   #generate kubeconfig
+  echo -e "\033[32m generate kubeconfig.\033[0m"
   username=$1
   CA_CERT="/etc/kubernetes/pki/ca.crt"
   CLIENT_CERT="/etc/kubernetes/pki/$username.crt"
@@ -287,6 +295,7 @@ install_node_files(){
 }
 
 create_serviceaccount(){
+  echo -e "\033[32m create ServiceAccount.\033[0m"
   kubectl create -f - <<EOF
   apiVersion: v1
   kind: ServiceAccount
