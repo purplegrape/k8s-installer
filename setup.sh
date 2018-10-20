@@ -59,7 +59,7 @@ install_containerd(){
       install -D -m 755 critest /usr/bin/critest
       rm -rf critest
       else
-      echo -e "please run wget https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.12.0/crictl-v1.12.0-linux-amd64.tar.gz"
+      echo -e "please run wget https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.12.0/critest-v1.12.0-linux-amd64.tar.gz"
       exit 1
     fi
 
