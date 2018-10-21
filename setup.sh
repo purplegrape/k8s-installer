@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# test under CentOS7 and kubernetes 1.12.1 ONLY,
+# test under CentOS7 and kubernetes 1.12.0 ONLY,
 # AT YOUR OWN RISK!!
 
 set -e
@@ -403,7 +403,8 @@ cleanup(){
   systemctl stop kube-apiserver || true
   systemctl stop etcd coredns containerd || true
   rm -rf /usr/bin/kube* /usr/bin/crictl /usr/bin/critest  /usr/bin/coredns /usr/bin/containerd /usr/bin/containerd-shim
-  rm -rf /etc/kubernetes /etc/sysconfig/kube* /var/lib/etcd/* /etc/containerd /etc/crictl.yaml /var/lib/kubelet
+  rm -rf /etc/kubernetes /etc/sysconfig/kube*  /etc/containerd /etc/crictl.yaml 
+  rm -rf /var/lib/etcd/* /var/lib/kubelet /var/run/kubernetes
   rm -rf /usr/lib/systemd/system/kube* /usr/lib/systemd/system/containerd.service /usr/lib/systemd/system/coredns.service
   systemctl daemon-reload
   clean_iptables_rules
