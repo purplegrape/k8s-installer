@@ -12,6 +12,11 @@ fi
 basedir=$(dirname $0)
 cd $basedir
 
+say_something(){
+  count=$[$count +1]
+  echo -e " ## $count ##:" $1
+}
+
 check_tarball(){
   mkdir -p download
   pushd download
@@ -26,7 +31,7 @@ check_tarball(){
 }
 
 clean_iptables_rules(){
-  echo -e "\033[32m flush iptables rules.\033[0m"
+  say_something "\033[32m flush iptables rules.\033[0m"
   iptables -t nat -F
   iptables -t nat -X
   iptables -t nat -Z
@@ -41,7 +46,7 @@ clean_iptables_rules(){
 }
 
 install_containerd(){
-  echo -e "\033[32m setting up containerd.\033[0m"
+  say_something "\033[32m setting up containerd.\033[0m"
   mkdir -p download
   pushd download
     if [ -f crictl-v1.12.0-linux-amd64.tar.gz ];then
@@ -50,7 +55,7 @@ install_containerd(){
       /usr/bin/crictl completion bash > /etc/bash_completion.d/crictl.bash
       rm -rf crictl
       else
-      echo -e "please run wget https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.12.0/crictl-v1.12.0-linux-amd64.tar.gz"
+      say_something "please run wget https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.12.0/crictl-v1.12.0-linux-amd64.tar.gz"
       exit 1
     fi
 
@@ -59,7 +64,7 @@ install_containerd(){
       install -D -m 755 critest /usr/bin/critest
       rm -rf critest
       else
-      echo -e "please run wget https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.12.0/critest-v1.12.0-linux-amd64.tar.gz"
+      say_something "please run wget https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.12.0/critest-v1.12.0-linux-amd64.tar.gz"
       exit 1
     fi
 
@@ -69,7 +74,7 @@ install_containerd(){
       install -D bin/containerd-shim /usr/bin/containerd-shim
       rm -rf bin
       else
-      echo -e "please run wget https://github.com/containerd/containerd/releases/download/v1.2.0-rc.2/containerd-1.2.0-rc.2.linux-amd64.tar.gz"
+      say_something "please run wget https://github.com/containerd/containerd/releases/download/v1.2.0-rc.2/containerd-1.2.0-rc.2.linux-amd64.tar.gz"
       exit 1
     fi
   popd
@@ -83,14 +88,14 @@ install_containerd(){
 }
 
 install_etcd(){
-  echo -e "\033[32m setting up etcd.\033[0m"
+  say_something "\033[32m setting up etcd.\033[0m"
   rm -rf /var/lib/etcd/default.etcd
   systemctl enable etcd
   systemctl restart etcd
 }
 
 install_coredns(){
-  echo -e "\033[32m setting up coredns.\033[0m"
+  say_something "\033[32m setting up coredns.\033[0m"
   mkdir -p download
   pushd download
     if [ -f coredns_1.2.2_linux_amd64.tgz ];then
@@ -98,7 +103,7 @@ install_coredns(){
       install -D -m 755 coredns /usr/bin/coredns
       rm -rf coredns
       else
-      echo -e "please run wget https://github.com/coredns/coredns/releases/download/v1.2.2/coredns_1.2.2_linux_amd64.tgz"
+      say_something "please run wget https://github.com/coredns/coredns/releases/download/v1.2.2/coredns_1.2.2_linux_amd64.tgz"
       exit 1
     fi
   popd
@@ -111,15 +116,15 @@ install_coredns(){
 }
 
 check_user(){
-  echo -e "\033[32m checking user.\033[0m"
+  say_something "\033[32m checking user.\033[0m"
   getent group  kube > /dev/null || groupadd -r kube
   getent passwd kube > /dev/null || useradd -r -g kube -s /sbin/nologin -d / kube
 }
 
 install_docker(){
-  echo -e "\033[32m setting up docker.\033[0m"
+  say_something "\033[32m setting up docker.\033[0m"
   if (rpm -qa |grep -q docker-ce);then
-    echo -e "docker-ce has installed"
+    say_something "docker-ce has installed"
     else
     yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
     yum install docker-ce -q -y
@@ -132,27 +137,27 @@ install_docker(){
 }
 
 install_calico(){
-  echo -e "\033[32m setting up calico.\033[0m"
+  say_something "\033[32m setting up calico.\033[0m"
   mkdir -p download
   pushd download
     if [ -f calico-amd64 ];then
       install -D -m 755 calico-amd64 /usr/libexec/cni/calico
       else
-      echo -e "please run wget https://github.com/projectcalico/cni-plugin/releases/download/v3.2.3/calico-amd64"
+      say_something "please run wget https://github.com/projectcalico/cni-plugin/releases/download/v3.2.3/calico-amd64"
       exit 1
     fi
 
     if [ -f calico-ipam ];then
       install -D -m 755 calico-ipam /usr/libexec/cni/calico-ipam
       else
-      echo -e "please run wget https://github.com/projectcalico/cni-plugin/releases/download/v3.2.3/calico-ipam-amd64"
+      say_something "please run wget https://github.com/projectcalico/cni-plugin/releases/download/v3.2.3/calico-ipam-amd64"
       exit 1
     fi
   popd
 }
 
 keygen_ca(){
-  echo -e "\033[32m generate CA keys.\033[0m"
+  say_something "\033[32m generate CA keys.\033[0m"
   mkdir -p /etc/kubernetes/pki
   pushd /etc/kubernetes/pki
     openssl genrsa -out ca.key 4096
@@ -161,7 +166,7 @@ keygen_ca(){
 }
 
 keygen_apiserver(){
-  echo -e "\033[32m generate apiserver keys.\033[0m"
+  say_something "\033[32m generate apiserver keys.\033[0m"
   mkdir -p /etc/kubernetes/pki
   cat > /etc/kubernetes/pki/openssl.cnf <<EOF
   [req]
@@ -192,7 +197,7 @@ EOF
 }
 
 keygen_other(){
-  echo -e "\033[32m generate other user keys.\033[0m"
+  say_something "\033[32m generate other user keys.\033[0m"
   mkdir -p /etc/kubernetes/pki
   username=$1
   pushd /etc/kubernetes/pki
@@ -214,7 +219,7 @@ keygen(){
 }
 
 kubeconfig_local_admin(){
-  echo -e "\033[32m generate local admin kubeconfig.\033[0m"
+  say_something "\033[32m generate local admin kubeconfig.\033[0m"
   mkdir -p /root/.kube/
   > /root/.kube/config
   unset KUBECONFIG
@@ -225,8 +230,7 @@ kubeconfig_local_admin(){
 }
 
 kubeconfig_user(){
-  #generate kubeconfig
-  echo -e "\033[32m generate kubeconfig.\033[0m"
+  say_something "\033[32m generate kubeconfig.\033[0m"
   username=$1
   CA_CERT="/etc/kubernetes/pki/ca.crt"
   CLIENT_CERT="/etc/kubernetes/pki/$username.crt"
@@ -247,7 +251,7 @@ kubeconfig_user(){
 
 gen_kubeconfig(){
   if [ ! -f /usr/bin/kubectl ];then
-    echo -e "error: \033[31m/usr/bin/kubectl\033[0m not found"
+    say_something "error: \033[31m/usr/bin/kubectl\033[0m not found"
     exit 1
   fi
   kubeconfig_local_admin
@@ -257,7 +261,7 @@ gen_kubeconfig(){
 }
 
 install_master_files(){
-  echo -e "\033[32m install master files.\033[0m"
+  say_something "\033[32m install master files.\033[0m"
   check_tarball
   install -D -m 755 download/kubernetes/server/bin/kube-apiserver /usr/bin/kube-apiserver
   install -D -m 755 download/kubernetes/server/bin/kube-controller-manager /usr/bin/kube-controller-manager
@@ -278,7 +282,7 @@ install_master_files(){
 }
 
 install_node_files(){
-  echo -e "\033[32m install node files.\033[0m"
+  say_something "\033[32m install node files.\033[0m"
   check_tarball
   install -D -m 755 download/kubernetes/server/bin/kubelet /usr/bin/kubelet
   install -D -m 755 download/kubernetes/server/bin/kube-proxy /usr/bin/kube-proxy
@@ -295,7 +299,7 @@ install_node_files(){
 }
 
 create_serviceaccount(){
-  echo -e "\033[32m create ServiceAccount $1.\033[0m"
+  say_something "\033[32m create ServiceAccount $1.\033[0m"
   kubectl create -f - <<EOF
   apiVersion: v1
   kind: ServiceAccount
@@ -305,20 +309,20 @@ EOF
 }
 
 post_install_master(){
-  echo -e "\033[32m starting service kube-apiserver.\033[0m"
+  say_something "\033[32m starting service kube-apiserver.\033[0m"
   systemctl start kube-apiserver
   sleep 1
 
-  echo -e "\033[32m create clusterrolebonding.\033[0m"
+  say_something "\033[32m create clusterrolebonding.\033[0m"
   export KUBECONFIG=/root/.kube/config
   kubectl create clusterrolebinding mybonding-node --clusterrole=system:node --user=kubelet
   kubectl create clusterrolebinding mybonding-node-proxier --clusterrole=system:node-proxier --user=kube-proxy
   kubectl create clusterrolebinding mybonding-admin --clusterrole=cluster-admin --user=admin
 
   sleep 1
-  echo -e "\033[32m starting service kube-scheduler.\033[0m"
+  say_something "\033[32m starting service kube-scheduler.\033[0m"
   systemctl start kube-scheduler
-  echo -e "\033[32m starting kube-controller-manager.\033[0m"
+  say_something "\033[32m starting kube-controller-manager.\033[0m"
   systemctl start kube-controller-manager
 }
 
@@ -353,7 +357,7 @@ install_master(){
   
   echo
   echo
-  echo -e "\033[32m Good job !! If you see this message, your kubernetes installation has finished.\033[0m"
+  say_something "\033[32m Good job !! If you see this message, your kubernetes installation has finished.\033[0m"
   echo
   echo
 
@@ -375,7 +379,7 @@ install_node(){
   install_containerd
   install_node_files
   
-  echo -e "\033[32m starting service kubelet.\033[0m"
+  say_something "\033[32m starting service kubelet.\033[0m"
   if [ -f /etc/kubernetes/kubelet.yaml ];then
     systemctl start kubelet
     sleep 3
@@ -385,7 +389,7 @@ install_node(){
     exit 1
   fi
   
-  echo -e "\033[32m starting service kube-proxy.\033[0m"
+  say_something "\033[32m starting service kube-proxy.\033[0m"
   if [ -f /etc/kubernetes/kube-proxy.yaml ];then
     systemctl start kube-proxy
     echo -e "ip_vs\nip_vs_rr\nip_vs_wrr\nip_vs_sh" > /etc/modules-load.d/ipvs.conf
