@@ -9,6 +9,7 @@ User=kube
 Group=kube
 EnvironmentFile=-/etc/sysconfig/kube-controller-manager
 PermissionsStartOnly=true
+ExecStartPre=-/bin/mkdir -p /var/run/kubernetes
 ExecStartPre=-/usr/bin/chown -R kube:kube /var/run/kubernetes
 ExecStart=/usr/bin/kube-controller-manager $KUBE_CONTROLLER_MANAGER_ARGS
 Restart=on-failure
