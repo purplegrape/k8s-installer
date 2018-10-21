@@ -323,7 +323,7 @@ post_install_master(){
   systemctl start kube-controller-manager kube-scheduler
 }
 
-kubernetes-dashborad(){
+kubernetes_dashborad(){
   kubectl create serviceaccount kubernetes-dashboard --namespace kube-system
   kubectl describe serviceaccounts kubernetes-dashboard --namespace kube-system
 
