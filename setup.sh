@@ -14,7 +14,7 @@ cd $basedir
 
 say_something(){
   count=$[$count +1]
-  echo -e " ## $count ##:" $1
+  echo -e "## $count ##:" $1
 }
 
 check_tarball(){
@@ -24,7 +24,7 @@ check_tarball(){
       rm -rf kubernetes
       tar zxf kubernetes-server-linux-amd64.tar.gz
       else
-      echo -e "please run wget https://dl.k8s.io/v1.12.1/kubernetes-server-linux-amd64.tar.gz"
+      say_something "please run wget https://dl.k8s.io/v1.12.1/kubernetes-server-linux-amd64.tar.gz"
       exit 1
     fi
   popd
@@ -197,7 +197,7 @@ EOF
 }
 
 keygen_other(){
-  say_something "\033[32m generate other user keys.\033[0m"
+  say_something "\033[32m generate keys for user $1.\033[0m"
   mkdir -p /etc/kubernetes/pki
   username=$1
   pushd /etc/kubernetes/pki
