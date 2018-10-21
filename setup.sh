@@ -13,7 +13,7 @@ basedir=$(dirname $0)
 cd $basedir
 
 better_echo(){
-  count=$[$count +1]
+  count=$[$count + 1]
   echo -e "\033[31m## $count ##\033[33m" $1
 }
 
