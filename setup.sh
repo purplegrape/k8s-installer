@@ -339,9 +339,10 @@ install_master(){
   post_install_master
   install_node
 
-  sleep 5
+  sleep 3
   kubectl label node $HOSTNAME node-role.kubernetes.io/master=master
   #kubectl label node $HOSTNAME node-role.kubernetes.io/worker=worker
+  #kubectl patch node $HOSTNAME -p $'spec:\n unschedulable: true'
   kubectl get cs
   kubectl get svc
   kubectl get nodes --show-labels
@@ -372,7 +373,7 @@ install_node(){
   
   if [ -f /etc/kubernetes/kubelet.yaml ];then
     systemctl start kubelet
-    sleep 1
+    sleep 3
     else
     echo -e "\033[31mWarning:\033[0m\nBefore start kubelet,\nplease copy the following files from kubernetes master"
     echo -e "\033[32m/etc/kubernetes/kubelet.yaml\033[0m"
@@ -382,7 +383,7 @@ install_node(){
   if [ -f /etc/kubernetes/kube-proxy.yaml ];then
     systemctl start kube-proxy
     echo -e "ip_vs\nip_vs_rr\nip_vs_wrr\nip_vs_sh" > /etc/modules-load.d/ipvs.conf
-    sleep 1
+    sleep 3
     else
     echo -e "\033[31mWarning:\033[0m\nBefore start kube-proxy,\nplease copy the following files from kubernetes master"
     echo -e "\033[32m/etc/kubernetes/kube-proxy.yaml\033[0m"
