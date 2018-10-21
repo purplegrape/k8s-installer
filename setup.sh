@@ -315,7 +315,7 @@ post_install_master(){
 
   better_echo "\033[32m create clusterrolebonding.\033[0m"
   export KUBECONFIG=/root/.kube/config
-  kubectl create clusterrolebinding mybonding-node --clusterrole=system:node --user=kubelet
+  kubectl create clusterrolebinding mybonding-node --clusterrole=system:node --user=kubelet --group=system:node
   kubectl create clusterrolebinding mybonding-node-proxier --clusterrole=system:node-proxier --user=kube-proxy
   kubectl create clusterrolebinding mybonding-admin --clusterrole=cluster-admin --user=admin
 
