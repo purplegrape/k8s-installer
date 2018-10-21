@@ -220,7 +220,7 @@ kubeconfig_local_admin(){
   unset KUBECONFIG
   export KUBECONFIG=/root/.kube/config
   kubectl config set-cluster default-cluster --server=http://127.0.0.1:8080 --insecure-skip-tls-verify=true
-  kubectl config set-context default-system --cluster=default-cluster --user=cluster-admin
+  kubectl config set-context default-system --cluster=default-cluster --user=cluster-admin --namespace=default
   kubectl config use-context default-system
 }
 
@@ -311,12 +311,15 @@ post_install_master(){
   export KUBECONFIG=/root/.kube/config
   
   create_serviceaccount kubelet
+  #kubectl create serviceaccount kubelet
   kubectl create clusterrolebinding mybonding-node --clusterrole=system:node --user=kubelet
 
   create_serviceaccount kube-proxy
+  #kubectl create serviceaccount kube-proxy
   kubectl create clusterrolebinding mybonding-node-proxier --clusterrole=system:node-proxier --user=kube-proxy
 
   create_serviceaccount admin
+  #kubectl create serviceaccount admin
   kubectl create clusterrolebinding mybonding-admin --clusterrole=cluster-admin --user=admin
 
   sleep 1
