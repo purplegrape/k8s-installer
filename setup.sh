@@ -323,6 +323,14 @@ post_install_master(){
   systemctl start kube-controller-manager kube-scheduler
 }
 
+kubernetes-dashborad(){
+  kubectl create serviceaccount kubernetes-dashboard --namespace kube-system
+  kubectl describe serviceaccounts kubernetes-dashboard --namespace kube-system
+
+  kubectl create clusterrolebinding mybonding-dashborad --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
+  kubectl describe  clusterrolebindings.rbac.authorization.k8s.io mybonding-dashborad
+}
+
 install_master(){
   yum install epel-release -y
   yum install bash-completion etcd openssl moreutils git wget rsync -y
