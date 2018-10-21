@@ -41,7 +41,7 @@ clean_iptables_rules(){
 }
 
 install_containerd(){
-  echo -e "\033[32m configure containerd.\033[0m"
+  echo -e "\033[32m setting up containerd.\033[0m"
   mkdir -p download
   pushd download
     if [ -f crictl-v1.12.0-linux-amd64.tar.gz ];then
@@ -83,14 +83,14 @@ install_containerd(){
 }
 
 install_etcd(){
-  echo -e "\033[32m configure etcd.\033[0m"
+  echo -e "\033[32m setting up etcd.\033[0m"
   rm -rf /var/lib/etcd/default.etcd
   systemctl enable etcd
   systemctl restart etcd
 }
 
 install_coredns(){
-  echo -e "\033[32m configure coredns.\033[0m"
+  echo -e "\033[32m setting up coredns.\033[0m"
   mkdir -p download
   pushd download
     if [ -f coredns_1.2.2_linux_amd64.tgz ];then
@@ -117,7 +117,7 @@ check_user(){
 }
 
 install_docker(){
-  echo -e "\033[32m configure docker.\033[0m"
+  echo -e "\033[32m setting up docker.\033[0m"
   if (rpm -qa |grep -q docker-ce);then
     echo -e "docker-ce has installed"
     else
@@ -132,7 +132,7 @@ install_docker(){
 }
 
 install_calico(){
-  echo -e "\033[32m configure calico.\033[0m"
+  echo -e "\033[32m setting up calico.\033[0m"
   mkdir -p download
   pushd download
     if [ -f calico-amd64 ];then
@@ -257,6 +257,7 @@ gen_kubeconfig(){
 }
 
 install_master_files(){
+  echo -e "\033[32m install master files.\033[0m"
   check_tarball
   install -D -m 755 download/kubernetes/server/bin/kube-apiserver /usr/bin/kube-apiserver
   install -D -m 755 download/kubernetes/server/bin/kube-controller-manager /usr/bin/kube-controller-manager
@@ -269,8 +270,6 @@ install_master_files(){
   install -D -m 644 files/usr/lib/systemd/system/kube-apiserver.service /usr/lib/systemd/system/kube-apiserver.service
   install -D -m 644 files/usr/lib/systemd/system/kube-scheduler.service /usr/lib/systemd/system/kube-scheduler.service
   install -D -m 644 files/usr/lib/systemd/system/kube-controller-manager.service /usr/lib/systemd/system/kube-controller-manager.service
-  mkdir -p /var/run/kubernetes
-  chown -R kube:kube /var/run/kubernetes
   systemctl daemon-reload
   systemctl enable kube-apiserver kube-controller-manager kube-scheduler
 
@@ -279,6 +278,7 @@ install_master_files(){
 }
 
 install_node_files(){
+  echo -e "\033[32m install node files.\033[0m"
   check_tarball
   install -D -m 755 download/kubernetes/server/bin/kubelet /usr/bin/kubelet
   install -D -m 755 download/kubernetes/server/bin/kube-proxy /usr/bin/kube-proxy
@@ -295,7 +295,7 @@ install_node_files(){
 }
 
 create_serviceaccount(){
-  echo -e "\033[32m create ServiceAccount.\033[0m"
+  echo -e "\033[32m create ServiceAccount $1.\033[0m"
   kubectl create -f - <<EOF
   apiVersion: v1
   kind: ServiceAccount
@@ -305,17 +305,21 @@ EOF
 }
 
 post_install_master(){
+  echo -e "\033[32m starting service kube-apiserver.\033[0m"
   systemctl start kube-apiserver
   sleep 1
 
+  echo -e "\033[32m create clusterrolebonding.\033[0m"
   export KUBECONFIG=/root/.kube/config
-  
   kubectl create clusterrolebinding mybonding-node --clusterrole=system:node --user=kubelet
   kubectl create clusterrolebinding mybonding-node-proxier --clusterrole=system:node-proxier --user=kube-proxy
   kubectl create clusterrolebinding mybonding-admin --clusterrole=cluster-admin --user=admin
 
   sleep 1
-  systemctl start kube-controller-manager kube-scheduler
+  echo -e "\033[32m starting service kube-scheduler.\033[0m"
+  systemctl start kube-scheduler
+  echo -e "\033[32m starting kube-controller-manager.\033[0m"
+  systemctl start service kube-controller-manager
 }
 
 kubernetes_dashborad(){
@@ -327,8 +331,8 @@ kubernetes_dashborad(){
 }
 
 install_master(){
-  yum install epel-release -y
-  yum install bash-completion etcd openssl moreutils git wget rsync -y
+  yum install epel-release -q -y
+  yum install bash-completion etcd openssl moreutils git wget rsync -q -y
 
   check_user
   install_etcd
@@ -365,12 +369,13 @@ install_master(){
 
 install_node(){
   yum install bash-completion  lvm2 device-mapper-persistent-data yum-utils wget rsync \
-    containernetworking-plugins runc ipset conntrack-tools  socat ebtables bridge-utils  -y
+    containernetworking-plugins runc ipset conntrack-tools  socat ebtables bridge-utils -q -y
 
   #install_docker
   install_containerd
   install_node_files
   
+  echo -e "\033[32m starting service kubelet.\033[0m"
   if [ -f /etc/kubernetes/kubelet.yaml ];then
     systemctl start kubelet
     sleep 3
@@ -379,7 +384,8 @@ install_node(){
     echo -e "\033[32m/etc/kubernetes/kubelet.yaml\033[0m"
     exit 1
   fi
-
+  
+  echo -e "\033[32m starting service kube-proxy.\033[0m"
   if [ -f /etc/kubernetes/kube-proxy.yaml ];then
     systemctl start kube-proxy
     echo -e "ip_vs\nip_vs_rr\nip_vs_wrr\nip_vs_sh" > /etc/modules-load.d/ipvs.conf
