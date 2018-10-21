@@ -319,7 +319,7 @@ post_install_master(){
   echo -e "\033[32m starting service kube-scheduler.\033[0m"
   systemctl start kube-scheduler
   echo -e "\033[32m starting kube-controller-manager.\033[0m"
-  systemctl start service kube-controller-manager
+  systemctl start kube-controller-manager
 }
 
 kubernetes_dashborad(){
