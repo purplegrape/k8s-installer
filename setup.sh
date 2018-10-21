@@ -310,16 +310,8 @@ post_install_master(){
 
   export KUBECONFIG=/root/.kube/config
   
-  create_serviceaccount kubelet
-  #kubectl create serviceaccount kubelet
   kubectl create clusterrolebinding mybonding-node --clusterrole=system:node --user=kubelet
-
-  create_serviceaccount kube-proxy
-  #kubectl create serviceaccount kube-proxy
   kubectl create clusterrolebinding mybonding-node-proxier --clusterrole=system:node-proxier --user=kube-proxy
-
-  create_serviceaccount admin
-  #kubectl create serviceaccount admin
   kubectl create clusterrolebinding mybonding-admin --clusterrole=cluster-admin --user=admin
 
   sleep 1
