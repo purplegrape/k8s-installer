@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+better_echo(){
+  count=$[$count + 1]
+  echo -e "\033[31m## $count ##\033[33m" $1
+}
+
+check_user(){
+  better_echo "\033[32m checking user.\033[0m"
+  getent group  kube > /dev/null || groupadd -r kube
+  getent passwd kube > /dev/null || useradd -r -g kube -s /sbin/nologin -d / kube
+}
