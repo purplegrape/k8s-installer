@@ -258,7 +258,6 @@ install_master_files(){
   install -D -m 755 download/kubernetes/server/bin/kube-controller-manager /usr/bin/kube-controller-manager
   install -D -m 755 download/kubernetes/server/bin/kube-scheduler /usr/bin/kube-scheduler
   install -D -m 755 download/kubernetes/server/bin/kubectl /usr/bin/kubectl
-  install -D -m 755 download/kubernetes/server/bin/kubeadm /usr/bin/kubeadm
   install -D -m 644 files/etc/sysconfig/kube-apiserver /etc/sysconfig/kube-apiserver
   install -D -m 644 files/etc/sysconfig/kube-scheduler /etc/sysconfig/kube-scheduler
   install -D -m 644 files/etc/sysconfig/kube-controller-manager /etc/sysconfig/kube-controller-manager
@@ -268,7 +267,8 @@ install_master_files(){
   systemctl daemon-reload
   systemctl enable kube-apiserver kube-controller-manager kube-scheduler
 
-  kubeadm completion bash > /etc/bash_completion.d/kubeadm.bash
+  #install -D -m 755 download/kubernetes/server/bin/kubeadm /usr/bin/kubeadm
+  #kubeadm completion bash > /etc/bash_completion.d/kubeadm.bash
   kubectl completion bash > /etc/bash_completion.d/kubectl.bash
 }
 
@@ -363,8 +363,7 @@ install_master(){
 }
 
 install_node(){
-  yum install bash-completion  lvm2 device-mapper-persistent-data yum-utils wget rsync \
-    containernetworking-plugins runc ipset conntrack-tools  socat ebtables bridge-utils -q -y
+  yum install bash-completion bridge-utils containernetworking-plugins conntrack-tools ebtables lvm2 runc yum-utils wget ipset socat -q -y
 
   #install_docker
   install_containerd
