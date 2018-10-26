@@ -261,6 +261,25 @@ install_master_files(){
   echo -e "\033[32m OK \033[0m"
 }
 
+config_kube_apiserver(){
+  better_echo "\033[32m starting service kube-apiserver.\033[0m"
+  systemctl start kube-apiserver
+  sleep 1
+  echo -e "\033[32m OK \033[0m"
+}
+
+config_kube_scheduler(){
+  better_echo "\033[32m starting service kube-scheduler.\033[0m"
+  systemctl start kube-scheduler
+  echo -e "\033[32m OK \033[0m"
+}
+
+config_kube_controller_manager(){
+  better_echo "\033[32m starting kube-controller-manager.\033[0m"
+  systemctl start kube-controller-manager
+  echo -e "\033[32m OK \033[0m"
+}
+
 install_node_files(){
   check_tarball
   better_echo "\033[32m install node files.\033[0m"
@@ -306,21 +325,44 @@ config_kube_proxy(){
   echo -e "\033[32m OK \033[0m"
 }
 
-post_install_master(){
-  better_echo "\033[32m starting service kube-apiserver.\033[0m"
-  systemctl start kube-apiserver
+show_k8s_status(){
+  better_echo "\033[32m waiting for services become ready.\033[0m"
   sleep 1
-  echo -e "\033[32m OK \033[0m"
-
-  create_clusterrolebinding
-
-  better_echo "\033[32m starting service kube-scheduler.\033[0m"
-  systemctl start kube-scheduler
+  
+  echo
+  echo -e "\033[32m show kubernetes master service.\033[0m"
+  kubectl get svc
+  sleep 1
+  
+  echo
+  echo -e "\033[32m show kubernetes master health.\033[0m"
+  kubectl get cs
+  sleep 1
+  
+  echo
+  echo -e "\033[32m show kubernetes nodes.\033[0m"
+  kubectl get nodes -o wide
+  
+  #kubectl label node $HOSTNAME node-role.kubernetes.io/master=master
+  #kubectl label node $HOSTNAME node-role.kubernetes.io/worker=worker
+  #kubectl patch node $HOSTNAME -p $'spec:\n unschedulable: true'
+  
   echo -e "\033[32m OK \033[0m"
   
-  better_echo "\033[32m starting kube-controller-manager.\033[0m"
-  systemctl start kube-controller-manager
-  echo -e "\033[32m OK \033[0m"
+  echo
+  echo
+  better_echo "\033[32m Good job !! If you see this message, your kubernetes installation has finished.\033[0m"
+  echo
+  echo
+
+  # By default, your cluster will not schedule pods on the master for security reasons. 
+  # If you want to be able to schedule pods on the master, 
+  # e.g. for a single-machine Kubernetes cluster for development, run:
+  # kubectl taint nodes --all node-role.kubernetes.io/master-
+  
+  #check your cert
+  # cd /etc/kubernetes/pki
+  # curl --cacert ca.crt --key /etc/kubernetes/pki/client.key --cert client.crt  https://$(ifdata -pa eth0):6443
 }
 
 create_clusterrolebinding(){
