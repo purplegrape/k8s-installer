@@ -59,22 +59,13 @@ install_containerd(){
       exit 1
     fi
 
-    if [ -f critest-v1.12.0-linux-amd64.tar.gz ];then
-      tar zxf critest-v1.12.0-linux-amd64.tar.gz
-      install -D -m 755 critest /usr/bin/critest
-      rm -rf critest
-      else
-      better_echo "please run wget https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.12.0/critest-v1.12.0-linux-amd64.tar.gz"
-      exit 1
-    fi
-
-    if [ -f containerd-1.2.0-rc.2.linux-amd64.tar.gz ];then
-      tar zxf containerd-1.2.0-rc.2.linux-amd64.tar.gz
+    if [ -f containerd-1.2.0.linux-amd64.tar.gz ];then
+      tar zxf containerd-1.2.0.linux-amd64.tar.gz
       install -D bin/containerd /usr/bin/containerd
       install -D bin/containerd-shim /usr/bin/containerd-shim
       rm -rf bin
       else
-      better_echo "please run wget https://github.com/containerd/containerd/releases/download/v1.2.0-rc.2/containerd-1.2.0-rc.2.linux-amd64.tar.gz"
+      better_echo "please run wget https://github.com/containerd/containerd/releases/download/v1.2.0/containerd-1.2.0.linux-amd64.tar.gz"
       exit 1
     fi
   popd
