@@ -29,31 +29,12 @@ install_master(){
   install_master_files
   keygen
   gen_kubeconfig
-  post_install_master
+  config_kube_apiserver
+  create_clusterrolebinding
+  config_kube_scheduler
+  config_kube_controller_manager
   install_node
-
-  sleep 3
-  kubectl label node $HOSTNAME node-role.kubernetes.io/master=master
-  #kubectl label node $HOSTNAME node-role.kubernetes.io/worker=worker
-  #kubectl patch node $HOSTNAME -p $'spec:\n unschedulable: true'
-  kubectl get cs
-  kubectl get svc
-  kubectl get nodes --show-labels
-  
-  echo
-  echo
-  better_echo "\033[32m Good job !! If you see this message, your kubernetes installation has finished.\033[0m"
-  echo
-  echo
-
-  # By default, your cluster will not schedule pods on the master for security reasons. 
-  # If you want to be able to schedule pods on the master, 
-  # e.g. for a single-machine Kubernetes cluster for development, run:
-  # kubectl taint nodes --all node-role.kubernetes.io/master-
-  
-  #check your cert
-  # cd /etc/kubernetes/pki
-  # curl --cacert ca.crt --key /etc/kubernetes/pki/client.key --cert client.crt  https://$(ifdata -pa eth0):6443
+  show_k8s_status
 }
 
 install_node(){
