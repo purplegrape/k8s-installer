@@ -2,11 +2,329 @@
 
 better_echo(){
   count=$[$count + 1]
-  echo -e "\033[31m## $count ##\033[33m" $1
+  echo -e "\033[31m## Step $count ##\033[33m" $1
 }
 
 check_user(){
   better_echo "\033[32m checking user.\033[0m"
   getent group  kube > /dev/null || groupadd -r kube
   getent passwd kube > /dev/null || useradd -r -g kube -s /sbin/nologin -d / kube
+  echo -e "\033[32m OK \033[0m"
+}
+
+check_tarball(){
+  mkdir -p download
+  pushd download
+    if [ -f kubernetes-server-linux-amd64.tar.gz ];then
+      rm -rf kubernetes
+      tar zxf kubernetes-server-linux-amd64.tar.gz
+      else
+      better_echo "please run wget https://dl.k8s.io/v1.12.1/kubernetes-server-linux-amd64.tar.gz"
+      exit 1
+    fi
+  popd
+  echo -e "\033[32m OK \033[0m"
+}
+
+install_containerd(){
+  better_echo "\033[32m setting up containerd.\033[0m"
+  mkdir -p download
+  pushd download
+    if [ -f crictl-v1.12.0-linux-amd64.tar.gz ];then
+      tar zxf crictl-v1.12.0-linux-amd64.tar.gz
+      install -D -m 755 crictl /usr/bin/crictl
+      /usr/bin/crictl completion bash > /etc/bash_completion.d/crictl.bash
+      rm -rf crictl
+      else
+      better_echo "please run wget https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.12.0/crictl-v1.12.0-linux-amd64.tar.gz"
+      exit 1
+    fi
+
+    if [ -f containerd-1.2.0.linux-amd64.tar.gz ];then
+      tar zxf containerd-1.2.0.linux-amd64.tar.gz
+      install -D bin/containerd /usr/bin/containerd
+      install -D bin/containerd-shim /usr/bin/containerd-shim
+      rm -rf bin
+      else
+      better_echo "please run wget https://github.com/containerd/containerd/releases/download/v1.2.0/containerd-1.2.0.linux-amd64.tar.gz"
+      exit 1
+    fi
+  popd
+
+  install -D -m 644 files/etc/crictl.yaml /etc/crictl.yaml
+  install -D -m 644 files/etc/containerd/config.toml /etc/containerd/config.toml
+  install -D -m 644 files/usr/lib/systemd/system/containerd.service /usr/lib/systemd/system/containerd.service
+  systemctl daemon-reload
+  systemctl enable containerd
+  systemctl restart containerd
+  echo -e "\033[32m OK \033[0m"
+}
+
+install_docker(){
+  better_echo "\033[32m setting up docker.\033[0m"
+  if (rpm -qa |grep -q docker-ce);then
+    better_echo "docker-ce has already installed"
+    else
+    yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    yum install docker-ce -q -y
+    systemctl enable docker
+  fi
+  mkdir -p /etc/docker
+  echo -e "{\n\t\"registry-mirrors\": [\"https://docker.mirrors.ustc.edu.cn\"]\n}" > /etc/docker/daemon.json
+  systemctl restart docker
+  sleep 1
+  echo -e "\033[32m OK \033[0m"
+}
+
+install_calico(){
+  better_echo "\033[32m setting up calico.\033[0m"
+  mkdir -p download
+  pushd download
+    if [ -f calico-amd64 ];then
+      install -D -m 755 calico-amd64 /usr/libexec/cni/calico
+      else
+      better_echo "please run wget https://github.com/projectcalico/cni-plugin/releases/download/v3.2.3/calico-amd64"
+      exit 1
+    fi
+
+    if [ -f calico-ipam ];then
+      install -D -m 755 calico-ipam /usr/libexec/cni/calico-ipam
+      else
+      better_echo "please run wget https://github.com/projectcalico/cni-plugin/releases/download/v3.2.3/calico-ipam-amd64"
+      exit 1
+    fi
+  popd
+  echo -e "\033[32m OK \033[0m"
+}
+
+install_etcd(){
+  better_echo "\033[32m setting up etcd.\033[0m"
+  rm -rf /var/lib/etcd/default.etcd
+  systemctl enable etcd
+  systemctl restart etcd
+  echo -e "\033[32m OK \033[0m"
+}
+
+install_coredns(){
+  better_echo "\033[32m setting up coredns.\033[0m"
+  mkdir -p download
+  pushd download
+    if [ -f coredns_1.2.2_linux_amd64.tgz ];then
+      tar zxf coredns_1.2.2_linux_amd64.tgz
+      install -D -m 755 coredns /usr/bin/coredns
+      rm -rf coredns
+      else
+      better_echo "please run wget https://github.com/coredns/coredns/releases/download/v1.2.2/coredns_1.2.2_linux_amd64.tgz"
+      exit 1
+    fi
+  popd
+
+  install -D -m 644 files/etc/coredns/Corefile /etc/coredns/Corefile
+  install -D -m 644 files/usr/lib/systemd/system/coredns.service /usr/lib/systemd/system/coredns.service
+  systemctl daemon-reload
+  systemctl enable coredns
+  systemctl restart coredns
+  echo -e "\033[32m OK \033[0m"
+}
+
+keygen_ca(){
+  better_echo "\033[32m generate CA keys.\033[0m"
+  mkdir -p /etc/kubernetes/pki
+  pushd /etc/kubernetes/pki
+    openssl genrsa -out ca.key 4096
+    openssl req -x509 -new -nodes -key ca.key -subj "/CN=k8s-cluster" -days 3650 -out ca.crt
+  popd
+  echo -e "\033[32m OK \033[0m"
+}
+
+keygen_apiserver(){
+  better_echo "\033[32m generate apiserver keys.\033[0m"
+  mkdir -p /etc/kubernetes/pki
+  cat > /etc/kubernetes/pki/openssl.cnf <<EOF
+  [req]
+  req_extensions = v3_req
+  distinguished_name = req_distinguished_name
+  [req_distinguished_name]
+  [ v3_req ]
+  basicConstraints = CA:FALSE
+  keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+  subjectAltName = @alt_names
+  [alt_names]
+  DNS.1 = kubernetes
+  DNS.2 = kubernetes.default
+  DNS.3 = kubernetes.default.svc
+  DNS.4 = kubernetes.default.svc.cluster.local
+  DNS.5 = k8s-master
+  DNS.6 = $HOSTNAME
+  IP.1 = $(ifdata -pa eth0)
+  IP.2 = 10.254.0.1
+EOF
+
+  pushd /etc/kubernetes/pki
+    openssl genrsa -out apiserver.key 4096
+    openssl req -new -key apiserver.key -subj "/CN=k8s-master" -config openssl.cnf -out apiserver.csr
+    openssl x509 -req -in apiserver.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 3650 \
+      -extensions v3_req -extfile openssl.cnf -out apiserver.crt
+  popd
+  echo -e "\033[32m OK \033[0m"
+}
+
+keygen_user(){
+  better_echo "\033[32m generate keys for user $1.\033[0m"
+  mkdir -p /etc/kubernetes/pki
+  username=$1
+  pushd /etc/kubernetes/pki
+    openssl genrsa -out $username.key 4096
+    openssl req -new -key $username.key -subj "/CN=$username" -out $username.csr
+    openssl x509 -req -in $username.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 3650 -out $username.crt
+  popd
+  echo -e "\033[32m OK \033[0m"
+}
+
+keygen(){
+  rm -rf /etc/kubernetes/pki
+  keygen_ca
+  keygen_apiserver
+
+  keygen_user admin
+  keygen_user kube-scheduler
+  keygen_user kubelet
+  keygen_user kube-proxy
+  keygen_user etcd
+  #keygen_user dashboard
+}
+
+kubeconfig_local_admin(){
+  better_echo "\033[32m generate local admin kubeconfig.\033[0m"
+  mkdir -p /root/.kube/
+  > /root/.kube/config
+  unset KUBECONFIG
+  export KUBECONFIG=/root/.kube/config
+  kubectl config set-cluster default-cluster --server=http://127.0.0.1:8080 --insecure-skip-tls-verify=true
+  kubectl config set-context default-system --cluster=default-cluster --user=cluster-admin --namespace=default
+  kubectl config use-context default-system
+  echo -e "\033[32m OK \033[0m"
+}
+
+kubeconfig_user(){
+  better_echo "\033[32m generate kubeconfig.\033[0m"
+  username=$1
+  CA_CERT="/etc/kubernetes/pki/ca.crt"
+  CLIENT_CERT="/etc/kubernetes/pki/$username.crt"
+  CLIENT_KEY="/etc/kubernetes/pki/$username.key"
+
+  TOKEN=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null | base64 | tr -d "=+/[:space:]" | dd bs=32 count=1 2>/dev/null)
+  MASTER_IP=$(ifdata -pa eth0)
+
+  mkdir -p /etc/kubernetes
+  > /etc/kubernetes/$username.kubeconfig
+  unset KUBECONFIG
+  export KUBECONFIG=/etc/kubernetes/$username.kubeconfig
+  kubectl config set-cluster default-cluster --server=https://$MASTER_IP:6443 --certificate-authority=$CA_CERT --embed-certs=true
+  kubectl config set-credentials $username --client-certificate=$CLIENT_CERT --client-key=$CLIENT_KEY --embed-certs=true --token=$TOKEN
+  kubectl config set-context default-system --cluster=default-cluster --user=$username
+  kubectl config use-context default-system
+  echo -e "\033[32m OK \033[0m"
+}
+
+gen_kubeconfig(){
+  if [ ! -f /usr/bin/kubectl ];then
+    better_echo "error: \033[31m/usr/bin/kubectl\033[0m not found"
+    exit 1
+  fi
+  kubeconfig_local_admin
+  kubeconfig_user admin
+  kubeconfig_user kube-scheduler
+  kubeconfig_user kubelet
+  kubeconfig_user kube-proxy
+}
+
+install_master_files(){
+  better_echo "\033[32m install master files.\033[0m"
+  check_tarball
+  install -D -m 755 download/kubernetes/server/bin/kube-apiserver /usr/bin/kube-apiserver
+  install -D -m 755 download/kubernetes/server/bin/kube-controller-manager /usr/bin/kube-controller-manager
+  install -D -m 755 download/kubernetes/server/bin/kube-scheduler /usr/bin/kube-scheduler
+  install -D -m 755 download/kubernetes/server/bin/kubectl /usr/bin/kubectl
+  install -D -m 644 files/etc/sysconfig/kube-apiserver /etc/sysconfig/kube-apiserver
+  install -D -m 644 files/etc/sysconfig/kube-scheduler /etc/sysconfig/kube-scheduler
+  install -D -m 644 files/etc/sysconfig/kube-controller-manager /etc/sysconfig/kube-controller-manager
+  install -D -m 644 files/usr/lib/systemd/system/kube-apiserver.service /usr/lib/systemd/system/kube-apiserver.service
+  install -D -m 644 files/usr/lib/systemd/system/kube-scheduler.service /usr/lib/systemd/system/kube-scheduler.service
+  install -D -m 644 files/usr/lib/systemd/system/kube-controller-manager.service /usr/lib/systemd/system/kube-controller-manager.service
+  systemctl daemon-reload
+  systemctl enable kube-apiserver kube-controller-manager kube-scheduler
+
+  #install -D -m 755 download/kubernetes/server/bin/kubeadm /usr/bin/kubeadm
+  #kubeadm completion bash > /etc/bash_completion.d/kubeadm.bash
+  kubectl completion bash > /etc/bash_completion.d/kubectl.bash
+  echo -e "\033[32m OK \033[0m"
+}
+
+install_node_files(){
+  better_echo "\033[32m install node files.\033[0m"
+  check_tarball
+  install -D -m 755 download/kubernetes/server/bin/kubelet /usr/bin/kubelet
+  install -D -m 755 download/kubernetes/server/bin/kube-proxy /usr/bin/kube-proxy
+  install -D -m 644 files/etc/sysconfig/kubelet /etc/sysconfig/kubelet
+  install -D -m 644 files/etc/sysconfig/kube-proxy /etc/sysconfig/kube-proxy
+  install -D -m 644 files/usr/lib/systemd/system/kubelet.service /usr/lib/systemd/system/kubelet.service
+  install -D -m 644 files/usr/lib/systemd/system/kube-proxy.service /usr/lib/systemd/system/kube-proxy.service
+  install -D -m 644 files/etc/cni/net.d/20-loopback.conf /etc/cni/net.d/20-loopback.conf
+  install -D -m 644 files/etc/cni/net.d/30-cni-bridge.conf /etc/cni/net.d/30-cni-birdge.conf
+  rm -rf download/kubernetes
+  mkdir -p /var/lib/kubelet
+  systemctl daemon-reload
+  systemctl enable kubelet kube-proxy
+  echo -e "\033[32m OK \033[0m"
+}
+
+post_install_master(){
+  better_echo "\033[32m starting service kube-apiserver.\033[0m"
+  systemctl start kube-apiserver
+  sleep 1
+
+  better_echo "\033[32m create clusterrolebonding.\033[0m"
+  export KUBECONFIG=/root/.kube/config
+  kubectl create clusterrolebinding mybonding-node --clusterrole=system:node --user=kubelet --group=system:node
+  kubectl create clusterrolebinding mybonding-node-proxier --clusterrole=system:node-proxier --user=kube-proxy
+  kubectl create clusterrolebinding mybonding-kube-scheduler --clusterrole=system:kube-scheduler --user=kube-scheduler
+  kubectl create clusterrolebinding mybonding-volume-scheduler --clusterrole=system:volume-scheduler --user=kube-scheduler
+  kubectl create clusterrolebinding mybonding-admin --clusterrole=cluster-admin --user=admin
+  echo -e "\033[32m OK \033[0m"
+
+  sleep 1
+  better_echo "\033[32m starting service kube-scheduler.\033[0m"
+  systemctl start kube-scheduler
+  echo -e "\033[32m OK \033[0m"
+  
+  better_echo "\033[32m starting kube-controller-manager.\033[0m"
+  systemctl start kube-controller-manager
+  echo -e "\033[32m OK \033[0m"
+}
+
+kubernetes_dashborad(){
+  kubectl create serviceaccount kubernetes-dashboard --namespace kube-system
+  kubectl describe serviceaccounts kubernetes-dashboard --namespace kube-system
+
+  kubectl create clusterrolebinding mybonding-dashborad --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
+  kubectl describe  clusterrolebindings.rbac.authorization.k8s.io mybonding-dashborad
+  echo -e "\033[32m OK \033[0m"
+}
+
+
+clean_iptables_rules(){
+  better_echo "\033[32m flush iptables rules.\033[0m"
+  iptables -t nat -F
+  iptables -t nat -X
+  iptables -t nat -Z
+  iptables -F
+  iptables -X
+  iptables -Z
+  iptables -P INPUT ACCEPT
+  iptables -P FORWARD ACCEPT
+  iptables -P OUTPUT ACCEPT
+  iptables-save > /etc/sysconfig/iptables
+  sysctl -q -w net.ipv4.ip_forward=1
+  echo -e "\033[32m OK \033[0m"
 }
