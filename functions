@@ -19,7 +19,7 @@ check_tarball(){
       rm -rf kubernetes
       tar zxf kubernetes-server-linux-amd64.tar.gz
       else
-      better_echo "please run wget https://dl.k8s.io/v1.12.1/kubernetes-server-linux-amd64.tar.gz"
+      echo -e "please run wget https://dl.k8s.io/v1.12.1/kubernetes-server-linux-amd64.tar.gz"
       exit 1
     fi
   popd
@@ -36,7 +36,7 @@ install_containerd(){
       /usr/bin/crictl completion bash > /etc/bash_completion.d/crictl.bash
       rm -rf crictl
       else
-      better_echo "please run wget https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.12.0/crictl-v1.12.0-linux-amd64.tar.gz"
+      echo -e "please run wget https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.12.0/crictl-v1.12.0-linux-amd64.tar.gz"
       exit 1
     fi
 
@@ -46,7 +46,7 @@ install_containerd(){
       install -D bin/containerd-shim /usr/bin/containerd-shim
       rm -rf bin
       else
-      better_echo "please run wget https://github.com/containerd/containerd/releases/download/v1.2.0/containerd-1.2.0.linux-amd64.tar.gz"
+      echo -e "please run wget https://github.com/containerd/containerd/releases/download/v1.2.0/containerd-1.2.0.linux-amd64.tar.gz"
       exit 1
     fi
   popd
@@ -83,14 +83,14 @@ install_calico(){
     if [ -f calico-amd64 ];then
       install -D -m 755 calico-amd64 /usr/libexec/cni/calico
       else
-      better_echo "please run wget https://github.com/projectcalico/cni-plugin/releases/download/v3.2.3/calico-amd64"
+      echo -e "please run wget https://github.com/projectcalico/cni-plugin/releases/download/v3.2.3/calico-amd64"
       exit 1
     fi
 
     if [ -f calico-ipam ];then
       install -D -m 755 calico-ipam /usr/libexec/cni/calico-ipam
       else
-      better_echo "please run wget https://github.com/projectcalico/cni-plugin/releases/download/v3.2.3/calico-ipam-amd64"
+      echo -e "please run wget https://github.com/projectcalico/cni-plugin/releases/download/v3.2.3/calico-ipam-amd64"
       exit 1
     fi
   popd
@@ -114,7 +114,7 @@ install_coredns(){
       install -D -m 755 coredns /usr/bin/coredns
       rm -rf coredns
       else
-      better_echo "please run wget https://github.com/coredns/coredns/releases/download/v1.2.2/coredns_1.2.2_linux_amd64.tgz"
+      echo -e "please run wget https://github.com/coredns/coredns/releases/download/v1.2.2/coredns_1.2.2_linux_amd64.tgz"
       exit 1
     fi
   popd
@@ -229,7 +229,7 @@ kubeconfig_user(){
 
 gen_kubeconfig(){
   if [ ! -f /usr/bin/kubectl ];then
-    better_echo "error: \033[31m/usr/bin/kubectl\033[0m not found"
+    echo -e "error: \033[31m/usr/bin/kubectl\033[0m not found"
     exit 1
   fi
   kubeconfig_local_admin
@@ -245,7 +245,6 @@ install_master_files(){
   install -D -m 755 download/kubernetes/server/bin/kube-apiserver /usr/bin/kube-apiserver
   install -D -m 755 download/kubernetes/server/bin/kube-controller-manager /usr/bin/kube-controller-manager
   install -D -m 755 download/kubernetes/server/bin/kube-scheduler /usr/bin/kube-scheduler
-  install -D -m 755 download/kubernetes/server/bin/kubectl /usr/bin/kubectl
   install -D -m 644 files/etc/sysconfig/kube-apiserver /etc/sysconfig/kube-apiserver
   install -D -m 644 files/etc/sysconfig/kube-scheduler /etc/sysconfig/kube-scheduler
   install -D -m 644 files/etc/sysconfig/kube-controller-manager /etc/sysconfig/kube-controller-manager
@@ -257,13 +256,14 @@ install_master_files(){
 
   #install -D -m 755 download/kubernetes/server/bin/kubeadm /usr/bin/kubeadm
   #kubeadm completion bash > /etc/bash_completion.d/kubeadm.bash
+  install -D -m 755 download/kubernetes/server/bin/kubectl /usr/bin/kubectl
   kubectl completion bash > /etc/bash_completion.d/kubectl.bash
   echo -e "\033[32m OK \033[0m"
 }
 
 install_node_files(){
-  better_echo "\033[32m install node files.\033[0m"
   check_tarball
+  better_echo "\033[32m install node files.\033[0m"
   install -D -m 755 download/kubernetes/server/bin/kubelet /usr/bin/kubelet
   install -D -m 755 download/kubernetes/server/bin/kube-proxy /usr/bin/kube-proxy
   install -D -m 644 files/etc/sysconfig/kubelet /etc/sysconfig/kubelet
@@ -283,6 +283,7 @@ post_install_master(){
   better_echo "\033[32m starting service kube-apiserver.\033[0m"
   systemctl start kube-apiserver
   sleep 1
+  echo -e "\033[32m OK \033[0m"
 
   better_echo "\033[32m create clusterrolebonding.\033[0m"
   export KUBECONFIG=/root/.kube/config
@@ -312,7 +313,6 @@ kubernetes_dashborad(){
   echo -e "\033[32m OK \033[0m"
 }
 
-
 clean_iptables_rules(){
   better_echo "\033[32m flush iptables rules.\033[0m"
   iptables -t nat -F
@@ -328,3 +328,5 @@ clean_iptables_rules(){
   sysctl -q -w net.ipv4.ip_forward=1
   echo -e "\033[32m OK \033[0m"
 }
+
+# the end
