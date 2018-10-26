@@ -62,27 +62,8 @@ install_node(){
   #install_docker
   install_containerd
   install_node_files
-  
-  better_echo "\033[32m starting service kubelet.\033[0m"
-  if [ -f /etc/kubernetes/kubelet.kubeconfig ];then
-    systemctl start kubelet
-    sleep 3
-    else
-    echo -e "\033[31mWarning:\033[0m\nBefore start kubelet,\nplease copy the following files from kubernetes master"
-    echo -e "\033[32m/etc/kubernetes/kubelet.kubeconfig\033[0m"
-    exit 1
-  fi
-  
-  better_echo "\033[32m starting service kube-proxy.\033[0m"
-  if [ -f /etc/kubernetes/kube-proxy.kubeconfig ];then
-    systemctl start kube-proxy
-    echo -e "ip_vs\nip_vs_rr\nip_vs_wrr\nip_vs_sh" > /etc/modules-load.d/ipvs.conf
-    sleep 3
-    else
-    echo -e "\033[31mWarning:\033[0m\nBefore start kube-proxy,\nplease copy the following files from kubernetes master"
-    echo -e "\033[32m/etc/kubernetes/kube-proxy.kubeconfig\033[0m"
-    exit 1
-  fi
+  config_kubelet
+  config_kube_proxy
 }
 
 cleanup(){
