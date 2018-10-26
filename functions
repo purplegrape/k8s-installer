@@ -271,6 +271,7 @@ config_kube_apiserver(){
 config_kube_scheduler(){
   better_echo "\033[32m starting service kube-scheduler.\033[0m"
   systemctl start kube-scheduler
+  kube-scheduler --write-config-to /etc/kubernetes/kube-scheduler.conf.default
   echo -e "\033[32m OK \033[0m"
 }
 
@@ -323,7 +324,7 @@ config_kube_proxy(){
     echo -e "\033[32m/etc/kubernetes/kube-proxy.kubeconfig\033[0m"
     exit 1
   fi
-  #kube-proxy --write-config-to /etc/kubernetes/kube-proxy.conf
+  kube-proxy --write-config-to /etc/kubernetes/kube-proxy.conf.default
   echo -e "\033[32m OK \033[0m"
 }
 
