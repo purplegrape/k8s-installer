@@ -187,7 +187,7 @@ EOF
   popd
 }
 
-keygen_other(){
+keygen_user(){
   better_echo "\033[32m generate keys for user $1.\033[0m"
   mkdir -p /etc/kubernetes/pki
   username=$1
@@ -203,10 +203,12 @@ keygen(){
   keygen_ca
   keygen_apiserver
 
-  keygen_other admin
-  keygen_other kubelet
-  keygen_other kube-proxy
-  #keygen_other etcd
+  keygen_user admin
+  keygen_user kube-scheduler
+  keygen_user kubelet
+  keygen_user kube-proxy
+  keygen_user etcd
+  #keygen_user dashboard
 }
 
 kubeconfig_local_admin(){
@@ -231,9 +233,9 @@ kubeconfig_user(){
   MASTER_IP=$(ifdata -pa eth0)
 
   mkdir -p /etc/kubernetes
-  > /etc/kubernetes/$username.yaml
+  > /etc/kubernetes/$username.kubeconfig
   unset KUBECONFIG
-  export KUBECONFIG=/etc/kubernetes/$username.yaml
+  export KUBECONFIG=/etc/kubernetes/$username.kubeconfig
   kubectl config set-cluster default-cluster --server=https://$MASTER_IP:6443 --certificate-authority=$CA_CERT --embed-certs=true
   kubectl config set-credentials $username --client-certificate=$CLIENT_CERT --client-key=$CLIENT_KEY --embed-certs=true --token=$TOKEN
   kubectl config set-context default-system --cluster=default-cluster --user=$username
@@ -247,6 +249,7 @@ gen_kubeconfig(){
   fi
   kubeconfig_local_admin
   kubeconfig_user admin
+  kubeconfig_user kube-scheduler
   kubeconfig_user kubelet
   kubeconfig_user kube-proxy
 }
@@ -289,16 +292,6 @@ install_node_files(){
   systemctl enable kubelet kube-proxy
 }
 
-create_serviceaccount(){
-  better_echo "\033[32m create ServiceAccount $1.\033[0m"
-  kubectl create -f - <<EOF
-  apiVersion: v1
-  kind: ServiceAccount
-  metadata:
-    name: $1
-EOF
-}
-
 post_install_master(){
   better_echo "\033[32m starting service kube-apiserver.\033[0m"
   systemctl start kube-apiserver
@@ -308,6 +301,8 @@ post_install_master(){
   export KUBECONFIG=/root/.kube/config
   kubectl create clusterrolebinding mybonding-node --clusterrole=system:node --user=kubelet --group=system:node
   kubectl create clusterrolebinding mybonding-node-proxier --clusterrole=system:node-proxier --user=kube-proxy
+  kubectl create clusterrolebinding mybonding-kube-scheduler --clusterrole=system:kube-scheduler --user=kube-scheduler
+  kubectl create clusterrolebinding mybonding-volume-scheduler --clusterrole=system:volume-scheduler --user=kube-scheduler
   kubectl create clusterrolebinding mybonding-admin --clusterrole=cluster-admin --user=admin
 
   sleep 1
@@ -370,23 +365,23 @@ install_node(){
   install_node_files
   
   better_echo "\033[32m starting service kubelet.\033[0m"
-  if [ -f /etc/kubernetes/kubelet.yaml ];then
+  if [ -f /etc/kubernetes/kubelet.kubeconfig ];then
     systemctl start kubelet
     sleep 3
     else
     echo -e "\033[31mWarning:\033[0m\nBefore start kubelet,\nplease copy the following files from kubernetes master"
-    echo -e "\033[32m/etc/kubernetes/kubelet.yaml\033[0m"
+    echo -e "\033[32m/etc/kubernetes/kubelet.kubeconfig\033[0m"
     exit 1
   fi
   
   better_echo "\033[32m starting service kube-proxy.\033[0m"
-  if [ -f /etc/kubernetes/kube-proxy.yaml ];then
+  if [ -f /etc/kubernetes/kube-proxy.kubeconfig ];then
     systemctl start kube-proxy
     echo -e "ip_vs\nip_vs_rr\nip_vs_wrr\nip_vs_sh" > /etc/modules-load.d/ipvs.conf
     sleep 3
     else
     echo -e "\033[31mWarning:\033[0m\nBefore start kube-proxy,\nplease copy the following files from kubernetes master"
-    echo -e "\033[32m/etc/kubernetes/kube-proxy.yaml\033[0m"
+    echo -e "\033[32m/etc/kubernetes/kube-proxy.kubeconfig\033[0m"
     exit 1
   fi
 }
