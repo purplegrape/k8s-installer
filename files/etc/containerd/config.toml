@@ -53,10 +53,10 @@ oom_score = -999
       [plugins.cri.registry.mirrors]
         [plugins.cri.registry.mirrors."docker.io"]
           endpoint = ["https://docker.mirrors.ustc.edu.cn"]
-        #[plugins.cri.registry.mirrors."test.secure-registry.io"]
-        #  endpoint = ["https://HostIP1:Port1"]
         #[plugins.cri.registry.mirrors."test.insecure-registry.io"]
-        #  endpoint = ["http://HostIP2:Port2"]
+        #  endpoint = ["http://HostIP1:Port1"]
+        #[plugins.cri.registry.mirrors."test.secure-registry.io"]
+        #  endpoint = ["https://HostIP2:Port2"]
     [plugins.cri.x509_key_pair_streaming]
       tls_cert_file = ""
       tls_key_file = ""
