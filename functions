@@ -216,10 +216,10 @@ kubeconfig_user(){
   TOKEN=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null | base64 | tr -d "=+/[:space:]" | dd bs=32 count=1 2>/dev/null)
   MASTER_IP=$(ifdata -pa eth0)
 
-  mkdir -p /etc/kubernetes
-  > /etc/kubernetes/$username.kubeconfig
+  mkdir -p /etc/kubernetes/kubeconfig
+  > /etc/kubernetes/kubeconfig/$username.yaml
   unset KUBECONFIG
-  export KUBECONFIG=/etc/kubernetes/$username.kubeconfig
+  export KUBECONFIG=/etc/kubernetes/kubeconfig/$username.yaml
   kubectl config set-cluster default-cluster --server=https://$MASTER_IP:6443 --certificate-authority=$CA_CERT --embed-certs=true
   kubectl config set-credentials $username --client-certificate=$CLIENT_CERT --client-key=$CLIENT_KEY --embed-certs=true --token=$TOKEN
   kubectl config set-context default-system --cluster=default-cluster --user=$username
