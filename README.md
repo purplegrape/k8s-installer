@@ -5,13 +5,13 @@ official binary file based k8s installer for kubernetes 1.12.1 (still not workin
 ##### 通过逆向 kubeadm 部署过程得来，可以作为学习之用，由于部署架构简单，不建议在生产环境使用。  
 ##### 本项目很大程度可离线部署。
 
-####### 内网docker仓库是必须的，本项目预设的地址是 insecure-registry.docker.local   
-####### 如有改动，请酌情修改如下文件
+###### 内网docker仓库是必须的，本项目预设的地址是 insecure-registry.docker.local   
+###### 如有改动，请酌情修改如下文件
 /etc/containerd/config.toml  
 /etc/sysconfig/kubelet  
 /etc/docker/daemon.json  
 
-##### 使用方法（服务端master）  
+#### 使用方法（服务端master）  
 yum install git wget -y  
 git clone https://github.com/purplegrape/k8s-installer  
 mkdir -p download  
@@ -22,7 +22,7 @@ chmod 755 setup.sh
 ##### 上述步骤可重复执行，推倒重来  
 
 
-##### 客户端（node）  
+#### 客户端（node）  
 yum install git wget -y  
 git clone https://github.com/purplegrape/k8s-installer  
 chmod 755 setup.sh  
