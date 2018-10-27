@@ -22,7 +22,7 @@ git clone https://github.com/purplegrape/k8s-installer
 chmod 755 setup.sh  
 ./setup.sh node  
 
-##### 按照提示，将服务端的key复制到客户端（kubelet.yaml和kube-proxy.yaml）  
+##### 按照提示，将服务端的key复制到客户端（kubelet.kubeconfig 和 kube-proxy.kubeconfig）  
 
 #### 其他
 内网docker仓库是必须的，本项目预设的地址是 insecure-registry.docker.local  
