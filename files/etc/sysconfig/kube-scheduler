@@ -1,1 +1,1 @@
-KUBE_SCHEDULER_ARGS="--kubeconfig=/etc/kubernetes/kube-scheduler.kubeconfig --leader-elect=true --logtostderr=true --v 0"
+KUBE_SCHEDULER_ARGS="--kubeconfig=/etc/kubernetes/kubeconfig/kube-scheduler.yaml --leader-elect=true --logtostderr=true --v 0"
