@@ -1,5 +1,5 @@
 KUBELET_ARGS=" \
-  --kubeconfig=/etc/kubernetes/kubelet.kubeconfig \
+  --kubeconfig=/etc/kubernetes/kubeconfig/kubelet.yaml \
   --cluster-dns=127.0.0.1 \
   --cluster-domain=cluster.local \
   --allow-privileged=true \
