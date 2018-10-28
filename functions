@@ -80,6 +80,12 @@ install_calico(){
   better_echo "\033[32m setting up calico.\033[0m"
   mkdir -p download
   pushd download
+    if [ -f calicoctl-linux-amd64 ];then
+      install -D -m 755 calicoctl-linux-amd64 /usr/bin/calicoctl
+      else
+      echo -e "please run wget https://github.com/projectcalico/calicoctl/releases/download/v3.3.0/calicoctl-linux-amd64"
+    fi
+    
     if [ -f calico-amd64 ];then
       install -D -m 755 calico-amd64 /usr/libexec/cni/calico
       else
@@ -94,6 +100,9 @@ install_calico(){
       exit 1
     fi
   popd
+  
+  calicoctl install node --image=quay.io/calico/node:latest
+  
   echo -e "\033[32m OK \033[0m"
 }
 
