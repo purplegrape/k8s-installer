@@ -101,7 +101,8 @@ install_calico(){
     fi
   popd
   
-  calicoctl install node --image=quay.io/calico/node:latest
+  #docker pull quay.io/calico/node:latest
+  #calicoctl node run --node-image=quay.io/calico/node:latest
   
   echo -e "\033[32m OK \033[0m"
 }
