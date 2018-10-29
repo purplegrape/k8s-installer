@@ -14,4 +14,5 @@ KUBELET_ARGS=" \
   --cni-bin-dir=/usr/libexec/cni \
   --cni-conf-dir=/etc/cni/net.d \
   --pod-infra-container-image=insecure-registry.docker.local/k8s.gcr.io/pause:3.1 \
+  --maximum-dead-containers=64 \
   --logtostderr=true --v 0"
