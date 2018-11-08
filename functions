@@ -53,7 +53,7 @@ install_containerd(){
 
   install -D -m 644 files/etc/crictl.yaml /etc/crictl.yaml
   install -D -m 644 files/etc/containerd/config.toml /etc/containerd/config.toml
-  install -D -m 644 files/usr/lib/systemd/system/containerd.service /usr/lib/systemd/system/containerd.service
+  install -D -m 644 files/usr/lib/systemd/system/containerd.service /lib/systemd/system/containerd.service
   systemctl daemon-reload
   systemctl enable containerd
   systemctl restart containerd
@@ -130,7 +130,7 @@ install_coredns(){
   popd
 
   install -D -m 644 files/etc/coredns/Corefile /etc/coredns/Corefile
-  install -D -m 644 files/usr/lib/systemd/system/coredns.service /usr/lib/systemd/system/coredns.service
+  install -D -m 644 files/usr/lib/systemd/system/coredns.service /lib/systemd/system/coredns.service
   systemctl daemon-reload
   systemctl enable coredns
   systemctl restart coredns
@@ -258,9 +258,9 @@ install_master_files(){
   install -D -m 644 files/etc/sysconfig/kube-apiserver /etc/sysconfig/kube-apiserver
   install -D -m 644 files/etc/sysconfig/kube-scheduler /etc/sysconfig/kube-scheduler
   install -D -m 644 files/etc/sysconfig/kube-controller-manager /etc/sysconfig/kube-controller-manager
-  install -D -m 644 files/usr/lib/systemd/system/kube-apiserver.service /usr/lib/systemd/system/kube-apiserver.service
-  install -D -m 644 files/usr/lib/systemd/system/kube-scheduler.service /usr/lib/systemd/system/kube-scheduler.service
-  install -D -m 644 files/usr/lib/systemd/system/kube-controller-manager.service /usr/lib/systemd/system/kube-controller-manager.service
+  install -D -m 644 files/usr/lib/systemd/system/kube-apiserver.service /lib/systemd/system/kube-apiserver.service
+  install -D -m 644 files/usr/lib/systemd/system/kube-scheduler.service /lib/systemd/system/kube-scheduler.service
+  install -D -m 644 files/usr/lib/systemd/system/kube-controller-manager.service /lib/systemd/system/kube-controller-manager.service
   systemctl daemon-reload
   systemctl enable kube-apiserver kube-controller-manager kube-scheduler
 
@@ -298,8 +298,8 @@ install_node_files(){
   install -D -m 755 download/kubernetes/server/bin/kube-proxy /usr/bin/kube-proxy
   install -D -m 644 files/etc/sysconfig/kubelet /etc/sysconfig/kubelet
   install -D -m 644 files/etc/sysconfig/kube-proxy /etc/sysconfig/kube-proxy
-  install -D -m 644 files/usr/lib/systemd/system/kubelet.service /usr/lib/systemd/system/kubelet.service
-  install -D -m 644 files/usr/lib/systemd/system/kube-proxy.service /usr/lib/systemd/system/kube-proxy.service
+  install -D -m 644 files/usr/lib/systemd/system/kubelet.service /lib/systemd/system/kubelet.service
+  install -D -m 644 files/usr/lib/systemd/system/kube-proxy.service /lib/systemd/system/kube-proxy.service
   install -D -m 644 files/etc/cni/net.d/20-loopback.conf /etc/cni/net.d/20-loopback.conf
   install -D -m 644 files/etc/cni/net.d/30-cni-bridge.conf /etc/cni/net.d/30-cni-birdge.conf
   rm -rf download/kubernetes
