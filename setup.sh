@@ -3,7 +3,7 @@
 # test under almalinux 9 and kubernetes 1.30.x ONLY,
 # AT YOUR OWN RISK!!
 
-set -x -e
+set -e
 
 if [ $EUID != 0 ];then
     echo -e "you MUST run as root"
