@@ -64,12 +64,12 @@ install_crio(){
     install -D -m 644 -t /etc/crio/ files/etc/crio/policy.json
     install -D -m 644 -t /etc/sysconfig/ files/etc/sysconfig/crio
 
-    install -D -m 644 -t /etc/containers/oci/hooks.d/ files/etc/containers/oci/hooks.d/crio-umount.conf
-    install -D -m 644 -t /etc/containers/ files/etc/containers/containers.conf
+    #install -D -m 644 -t /etc/containers/oci/hooks.d/ files/etc/containers/oci/hooks.d/crio-umount.conf
+    #install -D -m 644 -t /etc/containers/ files/etc/containers/containers.conf
+    #install -D -m 644 -t /etc/containers/ files/etc/containers/storage.conf
     install -D -m 644 -t /etc/containers/ files/etc/containers/policy.json
-    install -D -m 644 -t /etc/containers/ files/etc/containers/registries.conf
-    install -D -m 644 -t /etc/containers/ files/etc/containers/storage.conf
     install -D -m 644 -t /etc/containers/ files/etc/containers/mounts.conf
+    install -D -m 644 -t /etc/containers/ files/etc/containers/registries.conf
     install -D -m 644 -t /etc/containers/registries.conf.d/ files/etc/containers/registries.conf.d/*.conf
 
     systemctl enable crio --quiet
@@ -150,7 +150,7 @@ teardown(){
 
     findmnt -Un -t overlay |awk '{print "umount",$1}' |sh -x
 
-    rm -rf /etc/containers /etc/crio /etc/cni/net.d /etc/kubernetes /etc/firewalld
+    rm -rf /etc/containers /etc/crio /etc/cni/net.d /etc/kubernetes
     rm -rf /var/lib/{containers,crio}
     rm -rf /var/log/{containers,crio,pods,calico}
     rm -rf /var/lib/longhorn
