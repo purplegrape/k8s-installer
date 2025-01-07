@@ -1,0 +1,65 @@
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+bootstrapTokens:
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: abcdef.0123456789abcdef
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
+localAPIEndpoint:
+  advertiseAddress: 0.0.0.0
+  bindPort: 6443
+nodeRegistration:
+  criSocket: unix:///var/run/crio/crio.sock
+  imagePullPolicy: IfNotPresent
+  name: 
+  taints: null
+---
+apiServer:
+  timeoutForControlPlane: 4m0s
+apiVersion: kubeadm.k8s.io/v1beta3
+certificatesDir: /etc/kubernetes/pki
+clusterName: kubernetes
+controllerManager:
+  extraArgs:
+    bind-address: "0.0.0.0"
+dns: {}
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+    extraArgs:
+      listen-metrics-urls: "http://0.0.0.0:2381"
+imageRepository: registry.k8s.io
+kind: ClusterConfiguration
+kubernetesVersion: 1.30.8
+networking:
+  dnsDomain: cluster.local
+  podSubnet: 10.244.0.0/16
+  serviceSubnet: 10.254.0.0/16
+scheduler:
+  extraArgs:
+    bind-address: "0.0.0.0"
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+metricsBindAddress: "0.0.0.0"
+mode: "ipvs"
+ipvs:
+  scheduler: "rr"
+  strictARP: true
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+cgroupDriver: systemd
+containerLogMaxSize: 10Mi
+containerLogMaxFiles: 5
+failSwapOn: false
+maxPods: 110
+kubeReserved:
+  cpu: "100m"
+  memory: "100Mi"
+systemReserved:
+  cpu: "100m"
+  memory: "100Mi"
