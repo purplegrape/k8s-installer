@@ -17,9 +17,6 @@ cd $basedir
 version=1.30.8
 
 preflight(){
-    yum remove firewalld -q -y
-    rm -rf /etc/firewalld
-
     yum install -q -y epel-release
     yum install -q -y bash-completion curl wget irqbalance jq rsync tzdata util-linux zstd 
     yum install -q -y conntrack-tools criu iptables-nft iproute-tc ipset ipvsadm nftables socat
@@ -58,13 +55,15 @@ preflight(){
 install_crio(){
     systemctl is-failed crio --quiet || systemctl stop crio --quiet || true
 
-    yum install -y cri-o cri-tools kubernetes-cni
+    yum install -q -y cri-o cri-tools kubernetes-cni
 
     rm -rf /etc/containers /etc/crio
-    mkdir -p /etc/crio /etc/containers/oci/hooks.d/ /etc/containers/registries.conf.d /var/lib/containers/storage
+    mkdir -p /etc/crio /etc/containers/oci/hooks.d/ /etc/containers/registries.conf.d
 
     install -D -m 644 -t /etc/crio/ files/etc/crio/crio.conf
+    install -D -m 644 -t /etc/crio/ files/etc/crio/policy.json
     install -D -m 644 -t /etc/sysconfig/ files/etc/sysconfig/crio
+
     install -D -m 644 -t /etc/containers/oci/hooks.d/ files/etc/containers/oci/hooks.d/crio-umount.conf
     install -D -m 644 -t /etc/containers/ files/etc/containers/containers.conf
     install -D -m 644 -t /etc/containers/ files/etc/containers/policy.json
@@ -89,7 +88,7 @@ install_crio(){
 }
 
 install_node(){
-    yum install -y kubelet kubeadm
+    yum install -q -y kubelet kubeadm
     systemctl is-failed kubelet --quiet || systemctl stop kubelet --quiet || true
     mkdir -p /etc/kubernetes/manifests
     systemctl enable kubelet --now --quiet
@@ -104,7 +103,7 @@ install_node(){
 }
 
 install_master(){
-    yum install -y kubectl kubeadm
+    yum install -q -y kubectl kubeadm
     /usr/bin/zstd -fd files/usr/bin/helm.zst -o /usr/bin/helm
     chmod 755 /usr/bin/helm
     /usr/bin/helm completion bash > /usr/share/bash-completion/completions/helm
