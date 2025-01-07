@@ -14,15 +14,15 @@ basedir=$(dirname $0)
 cd $basedir
 . ./functions.sh
 
-version=1.30.4
+version=1.30.8
 
 preflight(){
     yum remove firewalld -q -y
     rm -rf /etc/firewalld
 
-    yum install -y epel-release
-    yum install bash-completion curl wget irqbalance jq rsync tzdata util-linux zstd -q -y
-    yum install conntrack-tools criu iptables-nft iproute-tc ipset ipvsadm nftables socat -q -y
+    yum install -q -y epel-release
+    yum install -q -y bash-completion curl wget irqbalance jq rsync tzdata util-linux zstd 
+    yum install -q -y conntrack-tools criu iptables-nft iproute-tc ipset ipvsadm nftables socat
 
     rm -rf /usr/share/containers/
     mkdir -p /etc/cni/net.d /usr/libexec/cni 
@@ -71,7 +71,7 @@ install_crio(){
     install -D -m 644 -t /etc/containers/ files/etc/containers/registries.conf
     install -D -m 644 -t /etc/containers/ files/etc/containers/storage.conf
     install -D -m 644 -t /etc/containers/ files/etc/containers/mounts.conf
-    install -D -m 644 -t /etc/containers/registries.conf.d/ files//etc/containers/registries.conf.d/k8s.conf
+    install -D -m 644 -t /etc/containers/registries.conf.d/ files/etc/containers/registries.conf.d/*.conf
 
     systemctl enable crio --quiet
     systemctl restart crio --quiet
