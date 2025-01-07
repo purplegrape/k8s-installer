@@ -18,8 +18,8 @@ version=1.30.8
 
 preflight(){
     yum install -q -y epel-release
-    yum install -q -y bash-completion curl wget irqbalance jq rsync tzdata util-linux zstd 
-    yum install -q -y conntrack-tools criu iptables-nft iproute-tc ipset ipvsadm nftables socat
+    yum install -q -y bash-completion curl gzip wget irqbalance jq rsync tar tzdata util-linux zstd 
+    yum install -q -y conntrack-tools criu fuse-overlayfs iptables-nft iproute-tc ipset ipvsadm nftables socat
 
     rm -rf /usr/share/containers/
     mkdir -p /etc/cni/net.d /usr/libexec/cni 
@@ -91,7 +91,8 @@ install_node(){
     yum install -q -y kubelet kubeadm
     systemctl is-failed kubelet --quiet || systemctl stop kubelet --quiet || true
     mkdir -p /etc/kubernetes/manifests
-    systemctl enable kubelet --now --quiet
+    systemctl enable kubelet --quiet
+    systemctl restart kubelet --quiet
 
     /usr/bin/kubeadm completion bash > /usr/share/bash-completion/completions/kubeadm
     /usr/bin/zstd -fd files/usr/bin/busybox.zst -o /usr/sbin/busybox
