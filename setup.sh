@@ -127,7 +127,7 @@ post_install_master(){
     install -D -m 600 /etc/kubernetes/admin.conf $HOME/.kube/config
 
     kubectl get nodes -o wide
-    #kubectl taint nodes --all node-role.kubernetes.io/master-
+    #kubectl taint nodes --all node-role.kubernetes.io/control-plane:NoSchedule-
 
     #kubectl create priorityclass database-critical --value=10000 >/dev/null
     #kubectl create priorityclass storage-critical  --value=20000 >/dev/null
