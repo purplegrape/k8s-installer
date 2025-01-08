@@ -151,11 +151,7 @@ teardown(){
 
     findmnt -Un -t overlay |awk '{print "umount",$1}' |sh -x
 
-    rm -rf /etc/containers /etc/crio /etc/cni/net.d /etc/kubernetes
-    rm -rf /var/lib/{containers,crio}
     rm -rf /var/log/{containers,crio,pods,calico}
-    rm -rf /var/lib/longhorn
-    #yum remove kubeadm kubelet kubectl cri-o -y
     reboot
 }
 
