@@ -135,11 +135,12 @@ post_install_master(){
     #kubectl create priorityclass network-critical  --value=30000 >/dev/null
 
     #kubectl apply -k k8s-yaml/fluent-bit/2.0.10/
-    #kubectl apply -k k8s-yaml/metrics-server/v0.6.2/
+    #kubectl apply -k k8s-yaml/metrics-server/v0.7.2/
 }
 
 setup_network(){
     kubectl apply -f k8s-yaml/calico/v3.28/calico-vxlan.yaml
+    #kubectl apply --server-side=true -f k8s-yaml/envoy-gateway/v1.2.4/install.yaml
 }
 
 teardown(){
