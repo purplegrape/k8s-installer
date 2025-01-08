@@ -139,7 +139,7 @@ post_install_master(){
 }
 
 setup_network(){
-    kubectl apply -f k8s-yaml/calico/v3.26/calico-vxlan.yaml
+    kubectl apply -f k8s-yaml/calico/v3.28/calico-vxlan.yaml
 }
 
 teardown(){
