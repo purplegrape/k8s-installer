@@ -2,6 +2,10 @@
 # test under almalinux 9 and kubernetes 1.30.x ONLY,
 # AT YOUR OWN RISK!!
 
+setup_loadbalancer(){
+    kubectl apply -k k8s/metallb/v0.14.9/
+}
+
 setup_envoy_gateway(){
     kubectl apply --server-side=true -f k8s-yaml/envoy-gateway/v1.2.4/install.yaml
 }

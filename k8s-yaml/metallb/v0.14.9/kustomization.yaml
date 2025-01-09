@@ -1,0 +1,4 @@
+resources:
+- metallb-native.yaml
+- L2Advertisement.yaml
+- IPAddressPool.yaml

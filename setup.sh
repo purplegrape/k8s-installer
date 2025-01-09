@@ -150,7 +150,7 @@ teardown(){
     systemctl stop crio kubelet --quiet || true
 
     findmnt -Un -t overlay |awk '{print "umount",$1}' |sh -x
-
+    rm -rf /etc/cni/net.d/*
     rm -rf /var/log/{containers,crio,pods,calico}
     reboot
 }
@@ -171,11 +171,17 @@ case "$1" in
     network)
         setup_network
         ;;
+    loadbalancer)
+        setup_loadbalancer
+        ;;
+    ingress)
+        setup_ingress_nginx
+        ;;
     teardown)
         teardown
         ;;
     *)
-        echo -e "\033[32m Usage: $0 {master|node|network|teardown} \033[0m"
+        echo -e "\033[32m Usage: $0 {master|node|network|loadbalancer|ingress|teardown} \033[0m"
         echo
         exit 1
 esac
