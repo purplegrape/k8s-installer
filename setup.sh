@@ -18,7 +18,7 @@ version=1.30.8
 
 preflight(){
     yum install -q -y epel-release
-    yum install -q -y bash-completion curl gzip wget irqbalance jq rsync tar tzdata util-linux zstd 
+    yum install -q -y bash-completion curl gzip nfs-utils wget irqbalance jq rsync tar tzdata util-linux zstd 
     yum install -q -y conntrack-tools criu fuse-overlayfs iptables-nft iproute-tc ipset ipvsadm nftables socat
 
     rm -rf /usr/share/containers/
