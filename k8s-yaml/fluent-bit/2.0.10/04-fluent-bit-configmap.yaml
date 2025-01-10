@@ -44,15 +44,15 @@ data:
         K8S-Logging.Exclude On
 
     [OUTPUT]
-        Name es
+        Name http
         Match kube.*
-        Host elasticsearch
-        Port 9200
-        Path /es
-        HTTP_User admin
-        HTTP_Passwd password
-        Generate_ID On
-        Logstash_Format On
-        Logstash_Prefix k8s-logs
-        Logstash_DateFormat %Y.%m.%d
-        Retry_Limit False
+        URI /api/default/default/_json
+        Host log.devops.cc
+        Port 5080
+        tls Off
+        Format json
+        Json_date_key    _timestamp
+        Json_date_format iso8601
+        HTTP_User root@example.com
+        HTTP_Passwd 860zLdTqEbxmVXIw
+        compress gzip

@@ -8,6 +8,7 @@ setup_loadbalancer(){
 
 setup_envoy_gateway(){
     kubectl apply --server-side=true -f k8s-yaml/envoy-gateway/v1.2.4/install.yaml
+    # kubectl get svc -n ingress-nginx
 }
 
 setup_ingress_nginx(){
