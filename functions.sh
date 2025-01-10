@@ -3,7 +3,7 @@
 # AT YOUR OWN RISK!!
 
 setup_loadbalancer(){
-    kubectl apply -k k8s/metallb/v0.14.9/
+    kubectl apply -k k8s-yaml/metallb/v0.14.9/
 }
 
 setup_envoy_gateway(){
