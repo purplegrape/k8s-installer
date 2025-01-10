@@ -30,7 +30,7 @@ spec:
                 - linux
       containers:
         - name: fluent-bit
-          image: "docker.io/fluent/fluent-bit:2.0.10"
+          image: "docker.io/fluent/fluent-bit:3.2.4"
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

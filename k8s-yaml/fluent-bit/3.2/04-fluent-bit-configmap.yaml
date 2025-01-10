@@ -35,6 +35,11 @@ data:
         Skip_Long_Lines On
         Refresh_Interval 10
 
+    [INPUT]
+        Name     kubernetes_events
+        Tag      k8s_events
+        Kube_url https://kubernetes.default.svc
+
     [FILTER]
         Name kubernetes
         Match kube.*
@@ -44,15 +49,29 @@ data:
         K8S-Logging.Exclude On
 
     [OUTPUT]
-        Name es
+        Name http
         Match kube.*
-        Host elasticsearch
-        Port 9200
-        Path /es
-        HTTP_User admin
-        HTTP_Passwd password
-        Generate_ID On
-        Logstash_Format On
-        Logstash_Prefix k8s-logs
-        Logstash_DateFormat %Y.%m.%d
-        Retry_Limit False
+        URI /api/default/containers/_json
+        Host openobserve
+        Port 5080
+        Tls Off
+        Format json
+        Json_date_key    _timestamp
+        Json_date_format iso8601
+        HTTP_User root@example.com
+        HTTP_Passwd 860zLdTqEbxmVXIw
+        Compress gzip
+
+    [OUTPUT]
+        Name http
+        Match k8s_events
+        URI /api/default/events/_json
+        Host openobserve
+        Port 5080
+        tls Off
+        Format json
+        Json_date_key    _timestamp
+        Json_date_format iso8601
+        HTTP_User root@example.com
+        HTTP_Passwd 860zLdTqEbxmVXIw
+        Compress gzip
