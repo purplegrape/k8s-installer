@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# test under almalinux 9 and kubernetes 1.30.x ONLY,
+# test under almalinux 9 and kubernetes 1.32.x ONLY,
 # AT YOUR OWN RISK!!
 
 set -e
@@ -14,7 +14,7 @@ basedir=$(dirname $0)
 cd $basedir
 . ./functions.sh
 
-version=1.30.8
+version=1.32.0
 
 preflight(){
     yum install -q -y epel-release
