@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit
+  namespace: logging
+  labels:
+    app.kubernetes.io/name: fluent-bit
+data:
+  custom_parsers.conf: |
+    [PARSER]
+        Name docker_no_time
+        Format json
+        Time_Keep Off
+        Time_Key time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L
+
+  fluent-bit.conf: |
+    [SERVICE]
+        Daemon Off
+        Flush 1
+        Log_Level info
+        Parsers_File parsers.conf
+        Parsers_File custom_parsers.conf
+        HTTP_Server On
+        HTTP_Listen 0.0.0.0
+        HTTP_Port 2020
+        Health_Check On
+
+    [INPUT]
+        Name tail
+        Tag kube.*
+        Path /var/log/containers/*.log
+        Multiline.parser docker, cri
+        Mem_Buf_Limit 5MB
+        Skip_Long_Lines On
+        Refresh_Interval 10
+
+    [FILTER]
+        Name kubernetes
+        Match kube.*
+        Merge_Log On
+        Keep_Log Off
+        K8S-Logging.Parser On
+        K8S-Logging.Exclude On
+
+    [OUTPUT]
+        Name http
+        Match kube.*
+        URI /api/default/default/_json
+        Host log.devops.cc
+        Port 5080
+        tls Off
+        Format json
+        Json_date_key    _timestamp
+        Json_date_format iso8601
+        HTTP_User root@example.com
+        HTTP_Passwd 860zLdTqEbxmVXIw
+        compress gzip

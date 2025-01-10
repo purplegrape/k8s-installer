@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit
+  namespace: logging
+  labels:
+    app.kubernetes.io/name: fluent-bit
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fluent-bit
+  template:    
+    metadata:
+      annotations:
+        fluentbit.io/exclude: "true"
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "2020"
+        prometheus.io/path: /api/v1/metrics/prometheus
+      labels:
+        app.kubernetes.io/name: fluent-bit
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+      containers:
+        - name: fluent-bit
+          image: "docker.io/fluent/fluent-bit:3.2.4"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 2020
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+          volumeMounts:
+            - name: config
+              mountPath: /fluent-bit/etc/fluent-bit.conf
+              subPath: fluent-bit.conf
+            - name: config
+              mountPath: /fluent-bit/etc/custom_parsers.conf
+              subPath: custom_parsers.conf
+            - name: varlog
+              mountPath: /var/log
+            - name: varlibcontainers
+              mountPath: /var/lib/containers
+              readOnly: true
+            - name: etcmachineid
+              mountPath: /etc/machine-id
+              readOnly: true
+      dnsPolicy: ClusterFirst
+      hostNetwork: false
+      serviceAccountName: fluent-bit
+      restartPolicy: Always
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+
+      volumes:
+        - name: config
+          configMap:
+            name: fluent-bit
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: varlibcontainers
+          hostPath:
+            path: /var/lib/containers
+        - name: etcmachineid
+          hostPath:
+            path: /etc/machine-id
+            type: File
+          
