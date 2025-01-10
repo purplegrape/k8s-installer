@@ -4,3 +4,4 @@ resources:
 - 03-fluent-bit-role-binding.yaml
 - 04-fluent-bit-configmap.yaml
 - 05-fluent-bit-ds.yaml
+- 06-external-openobserve.yaml

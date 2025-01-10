@@ -35,6 +35,11 @@ data:
         Skip_Long_Lines On
         Refresh_Interval 10
 
+    [INPUT]
+        Name     kubernetes_events
+        Tag      k8s_events
+        Kube_url https://kubernetes.default.svc
+
     [FILTER]
         Name kubernetes
         Match kube.*
@@ -46,8 +51,22 @@ data:
     [OUTPUT]
         Name http
         Match kube.*
-        URI /api/default/default/_json
-        Host log.devops.cc
+        URI /api/default/containers/_json
+        Host openobserve
+        Port 5080
+        Tls Off
+        Format json
+        Json_date_key    _timestamp
+        Json_date_format iso8601
+        HTTP_User root@example.com
+        HTTP_Passwd 860zLdTqEbxmVXIw
+        Compress gzip
+
+    [OUTPUT]
+        Name http
+        Match k8s_events
+        URI /api/default/events/_json
+        Host openobserve
         Port 5080
         tls Off
         Format json
@@ -55,4 +74,4 @@ data:
         Json_date_format iso8601
         HTTP_User root@example.com
         HTTP_Passwd 860zLdTqEbxmVXIw
-        compress gzip
+        Compress gzip
