@@ -55,6 +55,7 @@ preflight(){
 install_crio(){
     systemctl is-failed crio --quiet || systemctl stop crio --quiet || true
 
+    yum update -y
     yum install -q -y cri-o cri-tools kubernetes-cni
 
     rm -rf /etc/containers /etc/crio
