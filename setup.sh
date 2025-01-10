@@ -134,7 +134,7 @@ post_install_master(){
     #kubectl create priorityclass storage-critical  --value=20000 >/dev/null
     #kubectl create priorityclass network-critical  --value=30000 >/dev/null
 
-    #kubectl apply -k k8s-yaml/fluent-bit/2.0.10/
+    #kubectl apply -k k8s-yaml/fluent-bit/3.2/
     #kubectl apply -k k8s-yaml/metrics-server/v0.7.2/
 }
 
