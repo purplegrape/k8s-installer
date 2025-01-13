@@ -1,4 +1,4 @@
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: InitConfiguration
 bootstrapTokens:
 - groups:
@@ -19,7 +19,7 @@ nodeRegistration:
 ---
 apiServer:
   timeoutForControlPlane: 4m0s
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 certificatesDir: /etc/kubernetes/pki
 clusterName: kubernetes
 controllerManager:
@@ -33,7 +33,7 @@ etcd:
       listen-metrics-urls: "http://0.0.0.0:2381"
 imageRepository: registry.k8s.io
 kind: ClusterConfiguration
-kubernetesVersion: 1.32.0
+kubernetesVersion: v1.32.0
 networking:
   dnsDomain: cluster.local
   podSubnet: 10.244.0.0/16
