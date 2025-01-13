@@ -42,7 +42,8 @@ etcd:
   local:
     dataDir: /var/lib/etcd
     extraArgs:
-      listen-metrics-urls: "http://0.0.0.0:2381"
+      - name: listen-metrics-urls
+        value: "http://0.0.0.0:2381"
 dns:
   disabled: false # disable CoreDNS if true
 proxy:
