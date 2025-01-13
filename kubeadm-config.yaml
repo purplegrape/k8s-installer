@@ -14,33 +14,39 @@ localAPIEndpoint:
 nodeRegistration:
   criSocket: unix:///var/run/crio/crio.sock
   imagePullPolicy: IfNotPresent
+  imagePullSerial: true
   name: 
   taints: null
 ---
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: ClusterConfiguration
+clusterName: kubernetes
+certificatesDir: /etc/kubernetes/pki
+kubernetesVersion: v1.32.0
+imageRepository: registry.k8s.io
+networking:
+  dnsDomain: cluster.local
+  podSubnet: 10.244.0.0/16
+  serviceSubnet: 10.254.0.0/16
 apiServer:
   timeoutForControlPlane: 4m0s
-apiVersion: kubeadm.k8s.io/v1beta4
-certificatesDir: /etc/kubernetes/pki
-clusterName: kubernetes
 controllerManager:
   extraArgs:
-    bind-address: "0.0.0.0"
-dns: {}
+    - name: bind-address
+      value: "0.0.0.0"
+scheduler:
+  extraArgs:
+    - name: bind-address
+      value: "0.0.0.0"
 etcd:
   local:
     dataDir: /var/lib/etcd
     extraArgs:
       listen-metrics-urls: "http://0.0.0.0:2381"
-imageRepository: registry.k8s.io
-kind: ClusterConfiguration
-kubernetesVersion: v1.32.0
-networking:
-  dnsDomain: cluster.local
-  podSubnet: 10.244.0.0/16
-  serviceSubnet: 10.254.0.0/16
-scheduler:
-  extraArgs:
-    bind-address: "0.0.0.0"
+dns:
+  disabled: false # disable CoreDNS if true
+proxy:
+  disabled: false # disable kube-proxy if true
 ---
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
