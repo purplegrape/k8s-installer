@@ -28,8 +28,7 @@ networking:
   dnsDomain: cluster.local
   podSubnet: 10.244.0.0/16
   serviceSubnet: 10.254.0.0/16
-apiServer:
-  timeoutForControlPlane: 4m0s
+apiServer: {}
 controllerManager:
   extraArgs:
     - name: bind-address
