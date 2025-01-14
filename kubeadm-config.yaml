@@ -17,6 +17,8 @@ nodeRegistration:
   imagePullSerial: true
   name: 
   taints: null
+timeouts:
+  controlPlaneComponentHealthCheck: "4m"
 ---
 apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
