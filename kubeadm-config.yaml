@@ -33,7 +33,7 @@ etcd:
       listen-metrics-urls: "http://0.0.0.0:2381"
 imageRepository: registry.k8s.io
 kind: ClusterConfiguration
-kubernetesVersion: 1.30.8
+kubernetesVersion: 1.30.9
 networking:
   dnsDomain: cluster.local
   podSubnet: 10.244.0.0/16

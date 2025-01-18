@@ -14,7 +14,7 @@ basedir=$(dirname $0)
 cd $basedir
 . ./functions.sh
 
-version=1.30.8
+version=1.30.9
 
 preflight(){
     yum install -q -y epel-release
