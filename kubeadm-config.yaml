@@ -24,7 +24,7 @@ apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
 clusterName: kubernetes
 certificatesDir: /etc/kubernetes/pki
-kubernetesVersion: v1.32.0
+kubernetesVersion: v1.32.1
 imageRepository: registry.k8s.io
 networking:
   dnsDomain: cluster.local
